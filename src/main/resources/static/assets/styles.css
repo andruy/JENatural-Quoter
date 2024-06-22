@@ -1,0 +1,75 @@
+/* styles.css */
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #222; /* Dark background color */
+    color: #ddd; /* Light text color */
+}
+
+.container {
+    width: 90%;
+    max-width: 600px;
+    background: #333; /* Darker background for container */
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5); /* Darker box shadow */
+}
+
+h1 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #fff; /* White text color */
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #ccc; /* Light label text color */
+}
+
+input[type="text"],
+input[type="number"],
+select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #555; /* Darker border color */
+    border-radius: 4px;
+    background-color: #444; /* Darker background color for inputs */
+    color: #ddd; /* Light text color */
+}
+
+button {
+    padding: 10px 20px;
+    margin: 0 auto; /* Center the button horizontally */
+    display: block; /* Ensure it takes up full width when centered */
+    border: none;
+    border-radius: 4px;
+    background-color: #007BFF; /* Accent color */
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #0056b3; /* Darker accent color on hover */
+}
