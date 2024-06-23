@@ -26,7 +26,7 @@
             </div>
             <div class="form-group">
                 <label for="field3">Quantity:</label>
-                <input type="number" id="field3" name="field3" min="30000" step="10000" placeholder="30k min">
+                <input type="number" id="field3" name="field3" min="30000" step="10000" placeholder="30k min" required>
             </div>
             <div class="form-group">
                 <label for="field4">Bottle size:</label>
@@ -34,13 +34,21 @@
                     <option value="" disabled selected hidden>Bottle size</option>
                 </select>
             </div>
-            <div class="form-group">
-                <label for="field5">Pills per bottle:</label>
-                <input type="text" id="field5" name="field5">
+            <div class="form-group" style="display: none;">
+                <label for="field5">Bottle color:</label>
+                <select name="field5" id="field5" required></select>
             </div>
-            <div class="form-group">
-                <label for="field6">Field 6:</label>
-                <input type="text" id="field6" name="field6">
+            <div class="form-group" style="display: none;">
+                <label for="field6">Bottle cap type:</label>
+                <select name="field6" id="field6" required></select>
+            </div>
+            <div class="form-group" style="display: none;">
+                <label for="field7">Bottle cap color:</label>
+                <select name="field7" id="field7" required></select>
+            </div>
+            <div class="form-group" style="display: none;">
+                <label for="field8">Pills per bottle:</label>
+                <select name="field8" id="field8" required></select>
             </div>
             <div class="form-group">
                 <button type="submit">Submit</button>
