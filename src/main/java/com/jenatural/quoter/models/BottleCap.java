@@ -1,4 +1,6 @@
 package com.jenatural.quoter.models;
 
-public record BottleCap(String name, double cost) {
+import java.math.BigDecimal;
+
+public record BottleCap(String type, BigDecimal cost) {
 }

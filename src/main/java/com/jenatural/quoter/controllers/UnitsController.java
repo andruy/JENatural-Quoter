@@ -48,5 +48,9 @@ public class UnitsController {
     public ResponseEntity<List<String>> getBottleAndCapColors() {
         return ResponseEntity.ok(unitsService.getBottleAndCapColors());
     }
-    
+
+    @GetMapping("/activeIngredients")
+    public ResponseEntity<List<String>> getActiveIngredients(String param) {
+        return ResponseEntity.ok(unitsService.getActiveIngredients());
+    }
 }

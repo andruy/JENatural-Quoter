@@ -60,4 +60,19 @@ public class UnitsService {
         }
         return options;
     }
+
+    public List<String> getActiveIngredients() {
+        List<String> ingredients = new ArrayList<>();
+        ingredients.add("Vitamin C");
+        ingredients.add("Vitamin E");
+        ingredients.add("Vitamin K");
+        ingredients.add("Vitamin A");
+        ingredients.add("Vitamin B");
+        ingredients.add("Vitamin D");
+        ingredients.add("Vitamin B12");
+        ingredients.add("Vitamin B6");
+        ingredients.add("Vitamin B9");
+        ingredients.add("Vitamin B5");
+        return ingredients;
+    }
 }

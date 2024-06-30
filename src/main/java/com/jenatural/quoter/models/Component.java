@@ -1,4 +1,6 @@
 package com.jenatural.quoter.models;
 
-public record Component(String name, double cost) {
+import java.math.BigDecimal;
+
+public record Component(String name, BigDecimal costPerKg) {
 }

@@ -23,6 +23,7 @@ body {
     padding: 20px;
     border-radius: 8px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.5); /* Darker box shadow */
+    margin: auto 0;
 }
 
 h1 {
@@ -72,4 +73,14 @@ button {
 
 button:hover {
     background-color: #0056b3; /* Darker accent color on hover */
+}
+
+.smallSection {
+    display: flex;
+    justify-content: center;
+    font-size: 1rem;
+}
+
+#section2, #section3, #section4 {
+    display: none;
 }

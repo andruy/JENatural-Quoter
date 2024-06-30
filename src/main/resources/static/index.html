@@ -12,47 +12,76 @@
     <div class="container">
         <h1>Quote</h1>
         <form>
-            <div class="form-group">
-                <label for="field1">Mass:</label>
-                <select name="field1" id="field1" required>
-                    <option value="" disabled selected hidden>Grams per capsule</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="field2">Capsule type:</label>
-                <select name="field2" id="field2" required>
-                    <option value="" disabled selected hidden>Select capsule type</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="field3">Quantity:</label>
-                <input type="number" id="field3" name="field3" min="30000" step="10000" placeholder="30k min" required>
-            </div>
-            <div class="form-group">
-                <label for="field4">Bottle size:</label>
-                <select name="field4" id="field4" required>
-                    <option value="" disabled selected hidden>Bottle size</option>
-                </select>
-            </div>
-            <div class="form-group" style="display: none;">
-                <label for="field5">Bottle color:</label>
-                <select name="field5" id="field5" required></select>
-            </div>
-            <div class="form-group" style="display: none;">
-                <label for="field6">Bottle cap type:</label>
-                <select name="field6" id="field6" required></select>
-            </div>
-            <div class="form-group" style="display: none;">
-                <label for="field7">Bottle cap color:</label>
-                <select name="field7" id="field7" required></select>
-            </div>
-            <div class="form-group" style="display: none;">
-                <label for="field8">Pills per bottle:</label>
-                <select name="field8" id="field8" required></select>
-            </div>
-            <div class="form-group">
-                <button type="submit">Submit</button>
-            </div>
+            <section id="section1">
+                 <div>
+                     <h2 class="smallSection">Section 1</h2>
+                 </div>
+                <div class="form-group">
+                    <label for="field1">Mass:</label>
+                    <select name="field1" id="field1" required>
+                        <option value="" disabled selected hidden>Grams per capsule</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="field2">Capsule type:</label>
+                    <select name="field2" id="field2" required>
+                        <option value="" disabled selected hidden>Select capsule type</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="field3">Quantity:</label>
+                    <input type="number" id="field3" name="field3" min="30000" step="10000" placeholder="30k min" required>
+                </div>
+                <div class="form-group">
+                    <label for="field4">Bottle size:</label>
+                    <select name="field4" id="field4" required>
+                        <option value="" disabled selected hidden>Bottle size</option>
+                    </select>
+                </div>
+            </section>
+            <section id="section2">
+                <br>
+                <div>
+                    <h2 class="smallSection">Section 2</h2>
+                </div>
+                <div class="form-group">
+                    <label for="field5">Bottle color:</label>
+                    <select name="field5" id="field5" required></select>
+                </div>
+                <div class="form-group">
+                    <label for="field6">Bottle cap type:</label>
+                    <select name="field6" id="field6" required></select>
+                </div>
+                <div class="form-group">
+                    <label for="field7">Bottle cap color:</label>
+                    <select name="field7" id="field7" required></select>
+                </div>
+                <div class="form-group">
+                    <label for="field8">Pills per bottle:</label>
+                    <select name="field8" id="field8" required></select>
+                </div>
+            </section>
+            <section id="section3">
+                <br>
+                <div>
+                    <h2 class="smallSection">Section 3</h2>
+                </div>
+                <!-- TODO: new class -->
+                <div class="form-group">
+                    <label for="field9">Active ingredients:</label>
+                    <ul id="field9"></ul>
+                </div>
+                <div class="form-group">
+                    <label for="field10">Selected ingredients:</label>
+                    <ul id="field10"></ul>
+                </div>
+            </section>
+            <section id="section4">
+                <br>
+                <div class="form-group">
+                    <button type="submit">Submit</button>
+                </div>
+            </section>
         </form>
     </div>
 </body>

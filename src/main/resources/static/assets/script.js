@@ -16,7 +16,8 @@ const endpoints = {
     bottleSizes: "/bottleSizes",
     capTypes: "/capTypes",
     bottleCapTypes: "/bottleCapTypes",
-    bottleAndCapColors: "/bottleAndCapColors"
+    bottleAndCapColors: "/bottleAndCapColors",
+    activeIngredients: "/activeIngredients"
 }
 
 document.onload = getWeightUnits();
@@ -24,15 +25,46 @@ document.onload = getCapTypes();
 document.onload = getBottleSizes();
 document.onload = getBottleCapTypes();
 document.onload = getBottleAndCapColors();
+document.onload = getActiveIngredients();
 
 let bottleSizes;
 let bottleCapTypes;
 let bottleAndCapColors;
+let activeIngredients;
 
-const div5 = document.querySelectorAll(".form-group")[4];
-const div6 = document.querySelectorAll(".form-group")[5];
-const div7 = document.querySelectorAll(".form-group")[6];
-const div8 = document.querySelectorAll(".form-group")[7];
+for (let i = 0; i < 4; i++) {
+    document.querySelectorAll(".form-group")[i].addEventListener("change", function () {
+        if (field1.value != "" && field2.value != "" && field3.value != "" && field4.value != "") {
+            section2.style.display = "block";
+        } else {
+            section2.style.display = "none";
+        }
+    });
+}
+
+document.querySelectorAll(".form-group")[3].addEventListener("change", function () {
+    if (field4.value != "") {
+        section3.style.display = "none";
+    }
+})
+
+for (let i = 4; i < 8; i++) {
+    document.querySelectorAll(".form-group")[i].addEventListener("change", function () {
+        if (field5.value != "" && field6.value != "" && field7.value != "" && field8.value != "") {
+            section3.style.display = "block";
+        } else {
+            section3.style.display = "none";
+        }
+    });
+}
+
+document.querySelectorAll(".form-group")[8].addEventListener("change", function () {
+    if (field9.value != "") {
+        section4.style.display = "block";
+    } else {
+        section4.style.display = "none";
+    }
+});
 
 field4.addEventListener("change", function () {
     for (let key in bottleSizes) {
@@ -49,8 +81,8 @@ field4.addEventListener("change", function () {
                 field6.innerHTML = `<option value="" disabled selected hidden>Bottle cap type</option>`;
                 bottleCapTypes.forEach(element => {
                     const option = document.createElement("option");
-                    option.value = element.name;
-                    option.text = element.name;
+                    option.value = element.type;
+                    option.text = element.type;
                     field6.appendChild(option);
                 });
 
@@ -63,10 +95,6 @@ field4.addEventListener("change", function () {
                 });
 
                 field8.innerHTML = `<option value="" disabled selected hidden>Pills per bottle</option>`;
-                div5.style.display = "block";
-                div6.style.display = "block";
-                div7.style.display = "block";
-                div8.style.display = "block";
                 bottleSizes[key].forEach(element => {
                     const option = document.createElement("option");
                     option.value = element;
@@ -74,11 +102,6 @@ field4.addEventListener("change", function () {
                     field8.appendChild(option);
                 });
             }
-        } else {
-            div5.style.display = "none";
-            div6.style.display = "none";
-            div7.style.display = "none";
-            div8.style.display = "none";
         }
     }
 });
@@ -129,4 +152,16 @@ async function getBottleCapTypes() {
 async function getBottleAndCapColors() {
     const response = await fetch(endpoints.bottleAndCapColors);
     bottleAndCapColors = await response.json();
+}
+
+async function getActiveIngredients() {
+    const response = await fetch(endpoints.activeIngredients);
+    activeIngredients = await response.json();
+
+    console.log(activeIngredients);
+    for (let i = 0; i < activeIngredients.length; i++) {
+        const listItem = document.createElement("li");
+        listItem.appendChild(document.createTextNode(activeIngredients[i]));
+        field9.appendChild(listItem);
+    }
 }
