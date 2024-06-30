@@ -58,14 +58,6 @@ for (let i = 4; i < 8; i++) {
     });
 }
 
-document.querySelectorAll(".form-group")[8].addEventListener("change", function () {
-    if (field9.value != "") {
-        section4.style.display = "block";
-    } else {
-        section4.style.display = "none";
-    }
-});
-
 field4.addEventListener("change", function () {
     for (let key in bottleSizes) {
         if (bottleSizes.hasOwnProperty(key)) {
@@ -106,6 +98,71 @@ field4.addEventListener("change", function () {
     }
 });
 
+/**
+ * Active ingredients
+ */
+
+const label = document.querySelector('label[for="field9"]');
+label.innerText += ` ${field1.value}`;
+
+document.addEventListener('DOMContentLoaded', () => {
+    // Function to handle item selection
+    function selectItem(event) {
+        const item = event.target;
+        if (item.tagName === 'LI') {
+            item.classList.toggle('selected');
+        }
+
+        const temp = item.innerText;
+
+        if (item.tagName === 'LI' && item.classList.contains('selected')) {
+            item.innerHTML = `<div style="width: 35px; height: 35px; margin: auto"><svg width="100%" height="100%" viewBox="0 0 100 100"><circle class="circle" cx="50" cy="50" r="30" fill="none" stroke="#FFFFFF" stroke-width="5"/></svg></div>`;
+            setTimeout(() => {
+                if (item.parentElement.id === 'field9') {
+                    moveItemsDown(temp, item);
+                    return;
+                }
+
+                if (item.parentElement.id === 'field10') {
+                    moveItemsUp(temp, item);
+                    return;
+                }
+            }, 1000);
+        }
+    }
+
+    // Function to move selected items to the right
+    function moveItemsUp(temp, selectedItem) {
+        selectedItem.classList.remove('selected');
+        selectedItem.innerHTML = temp;
+        field9.appendChild(selectedItem);
+        sortList(field9);
+    }
+
+    // Function to move selected items to the left
+    function moveItemsDown(temp, selectedItem) {
+        selectedItem.classList.remove('selected');
+        selectedItem.innerHTML = temp;
+        field10.appendChild(selectedItem);
+        sortList(field10);
+    }
+    
+    field10.addEventListener('click', selectItem);
+    field9.addEventListener('click', selectItem);
+});
+
+function sortList(list) {
+    const items = list.getElementsByTagName('li');
+    const sortedItems = Array.from(items).sort((a, b) => a.innerText.localeCompare(b.innerText));
+    list.innerHTML = '';
+    for (let i = 0; i < sortedItems.length; i++) {
+        list.appendChild(sortedItems[i]);
+    }
+}
+
+/**
+ * Calling endpoints
+ */
 async function getWeightUnits() {
     const response = await fetch(endpoints.weightUnits);
     const data = await response.json();
@@ -162,6 +219,7 @@ async function getActiveIngredients() {
     for (let i = 0; i < activeIngredients.length; i++) {
         const listItem = document.createElement("li");
         listItem.appendChild(document.createTextNode(activeIngredients[i]));
-        field9.appendChild(listItem);
+        field10.appendChild(listItem);
+        sortList(field10);
     }
 }
