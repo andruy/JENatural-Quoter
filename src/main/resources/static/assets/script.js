@@ -102,8 +102,13 @@ field4.addEventListener("change", function () {
  * Active ingredients
  */
 
-const label = document.querySelector('label[for="field9"]');
-label.innerText += ` ${field1.value}`;
+// const label = document.querySelector('label[for="field9"]');
+// label.style.display = 'inline';
+// const span = document.createElement('span');
+// span.id = 'sourceValue';
+// span.innerText = field1.value;
+// label.insertAdjacentElement('afterend', span);
+// label.innerHTML = `Composition (${field1.value})`;
 
 document.addEventListener('DOMContentLoaded', () => {
     // Function to handle item selection
