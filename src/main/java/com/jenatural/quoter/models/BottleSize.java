@@ -8,7 +8,7 @@ public enum BottleSize {
 
     public Bottle getBottle() {
         if (this == ONEFIFTY) {
-            return new Bottle("150 cc / 5.0oz", "38mm");
+            return new Bottle("150cc / 5.0oz", "38mm");
         }
 
         if (this == TWOFIFTY) {

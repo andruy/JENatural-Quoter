@@ -6,12 +6,12 @@
 
 body {
     font-family: Arial, sans-serif;
-    margin: 0;
+    font-size: larger;
+    margin: 60px 0;
     padding: 0;
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
     background-color: #222; /* Dark background color */
     color: #ddd; /* Light text color */
 }
@@ -70,6 +70,7 @@ label {
 input[type="text"],
 input[type="number"],
 select {
+    height: 40px;
     width: 100%;
     padding: 10px;
     border: 1px solid #555; /* Darker border color */
@@ -107,7 +108,7 @@ button:hover {
 .circle {
     stroke-dasharray: 188.4; /* Circumference of the circle (2 * π * r) */
     stroke-dashoffset: 0;
-    animation: draw 1s linear forwards;
+    animation: draw .5s linear forwards;
 }
 
 @keyframes draw {

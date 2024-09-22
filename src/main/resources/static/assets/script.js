@@ -10,14 +10,16 @@ console.log(
     "\nsearch: " + search
 );
 
+const root = "/";
+
 // Endpoints
 const endpoints = {
-    weightUnits: "/weightUnits",
-    bottleSizes: "/bottleSizes",
-    capTypes: "/capTypes",
-    bottleCapTypes: "/bottleCapTypes",
-    bottleAndCapColors: "/bottleAndCapColors",
-    activeIngredients: "/activeIngredients"
+    weightUnits: root + "weightUnits",
+    bottleSizes: root + "bottleSizes",
+    capTypes: root + "capTypes",
+    bottleCapTypes: root + "bottleCapTypes",
+    bottleAndCapColors: root + "bottleAndCapColors",
+    activeIngredients: root + "activeIngredients"
 }
 
 document.onload = getWeightUnits();
@@ -58,7 +60,10 @@ for (let i = 4; i < 8; i++) {
     });
 }
 
-field4.addEventListener("change", function () {
+field1.addEventListener("change", resetSection2);
+field4.addEventListener("change", resetSection2);
+
+function resetSection2() {
     for (let key in bottleSizes) {
         if (bottleSizes.hasOwnProperty(key)) {
             if (key === field4.value) {
@@ -96,19 +101,34 @@ field4.addEventListener("change", function () {
             }
         }
     }
-});
+
+    // Move all items down from field9 to field10
+    for (let i = 0; i < field9.children.length; i++) {
+        const item = field9.children[i];
+        item.click();
+    }
+}
 
 /**
  * Active ingredients
  */
+const label = document.querySelector('label[for="field9"]');
+label.style.display = 'none';
 
-// const label = document.querySelector('label[for="field9"]');
-// label.style.display = 'inline';
-// const span = document.createElement('span');
-// span.id = 'sourceValue';
-// span.innerText = field1.value;
-// label.insertAdjacentElement('afterend', span);
-// label.innerHTML = `Composition (${field1.value})`;
+const observer = new MutationObserver(function () {
+    if (field9.querySelectorAll('li').length > 0) {
+        label.style.display = 'block';
+        // const span = document.createElement('span');
+        // span.id = 'sourceValue';
+        // span.innerText = "whatever";
+        // label.insertAdjacentElement('afterend', span);
+        label.innerHTML = `Composition (${field1.value}g)`;
+    } else {
+        label.style.display = 'none';
+    }
+});
+
+observer.observe(field9, { childList: true });
 
 document.addEventListener('DOMContentLoaded', () => {
     // Function to handle item selection
@@ -132,7 +152,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     moveItemsUp(temp, item);
                     return;
                 }
-            }, 1000);
+            }, 500);
         }
     }
 
@@ -220,7 +240,6 @@ async function getActiveIngredients() {
     const response = await fetch(endpoints.activeIngredients);
     activeIngredients = await response.json();
 
-    console.log(activeIngredients);
     for (let i = 0; i < activeIngredients.length; i++) {
         const listItem = document.createElement("li");
         listItem.appendChild(document.createTextNode(activeIngredients[i]));
