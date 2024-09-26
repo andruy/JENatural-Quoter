@@ -134,22 +134,26 @@ document.addEventListener('DOMContentLoaded', () => {
     // Function to handle item selection
     function selectItem(event) {
         const item = event.target;
-        if (item.tagName === 'LI') {
+        if (item.classList.contains('activeIngredient')) {
             item.classList.toggle('selected');
         }
 
-        const temp = item.innerText;
+        const temp = item.innerHTML;
 
-        if (item.tagName === 'LI' && item.classList.contains('selected')) {
-            item.innerHTML = `<div style="width: 35px; height: 35px; margin: auto"><svg width="100%" height="100%" viewBox="0 0 100 100"><circle class="circle" cx="50" cy="50" r="30" fill="none" stroke="#FFFFFF" stroke-width="5"/></svg></div>`;
+        if (item.classList.contains('activeIngredient') && item.classList.contains('selected')) {
+            const parent = item.parentElement;
+            parent.innerHTML = `<div style="width: 35px; height: 35px; margin: auto"><svg width="100%" height="100%" viewBox="0 0 100 100"><circle class="circle" cx="50" cy="50" r="30" fill="none" stroke="#FFFFFF" stroke-width="5"/></svg></div>`;
+            parent.style.backgroundColor = '#007BFF';
             setTimeout(() => {
-                if (item.parentElement.id === 'field9') {
+                if (parent.parentElement.id === 'field9') {
                     moveItemsDown(temp, item);
+                    parent.remove();
                     return;
                 }
 
-                if (item.parentElement.id === 'field10') {
+                if (parent.parentElement.id === 'field10') {
                     moveItemsUp(temp, item);
+                    parent.remove();
                     return;
                 }
             }, 500);
@@ -171,17 +175,19 @@ document.addEventListener('DOMContentLoaded', () => {
         field10.appendChild(selectedItem);
         sortList(field10);
     }
-    
+
     field10.addEventListener('click', selectItem);
     field9.addEventListener('click', selectItem);
 });
 
 function sortList(list) {
-    const items = list.getElementsByTagName('li');
+    const items = list.querySelectorAll('.activeIngredient');
     const sortedItems = Array.from(items).sort((a, b) => a.innerText.localeCompare(b.innerText));
     list.innerHTML = '';
     for (let i = 0; i < sortedItems.length; i++) {
-        list.appendChild(sortedItems[i]);
+        const listItem = document.createElement("li");
+        listItem.appendChild(sortedItems[i]);
+        list.appendChild(listItem);
     }
 }
 
@@ -241,8 +247,11 @@ async function getActiveIngredients() {
     activeIngredients = await response.json();
 
     for (let i = 0; i < activeIngredients.length; i++) {
+        const button = document.createElement("button");
+        button.appendChild(document.createTextNode(activeIngredients[i]));
         const listItem = document.createElement("li");
-        listItem.appendChild(document.createTextNode(activeIngredients[i]));
+        listItem.appendChild(button);
+        button.classList.add("activeIngredient");
         field10.appendChild(listItem);
         sortList(field10);
     }
