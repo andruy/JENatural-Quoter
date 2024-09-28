@@ -43,6 +43,7 @@ ul {
 }
 
 li {
+    display: flex;
     text-align: center;
     margin: 5px 0;
     background-color: #444;
@@ -82,12 +83,15 @@ li button {
     color: white;
     font-size: 16px;
     cursor: pointer;
-    width: 100%;
     height: 40px;
 }
 
 button:hover {
     background-color: #0056b3; /* Darker accent color on hover */
+}
+
+.activeIngredient {
+    flex: 6;
 }
 
 .smallSection {

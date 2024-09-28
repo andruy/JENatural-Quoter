@@ -13,7 +13,6 @@ import com.jenatural.quoter.models.BottleCap;
 import com.jenatural.quoter.services.UnitsService;
 import org.springframework.web.bind.annotation.RequestParam;
 
-
 @RestController
 public class UnitsController {
     @Autowired

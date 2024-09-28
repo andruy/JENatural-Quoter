@@ -104,9 +104,11 @@ function resetSection2() {
 
     // Move all items down from field9 to field10
     for (let i = 0; i < field9.children.length; i++) {
-        const item = field9.children[i];
+        const item = field9.children[i].querySelector('.activeIngredient');
         item.click();
     }
+
+    section3.style.display = "none";
 }
 
 /**
@@ -122,7 +124,7 @@ const observer = new MutationObserver(function () {
         // span.id = 'sourceValue';
         // span.innerText = "whatever";
         // label.insertAdjacentElement('afterend', span);
-        label.innerHTML = `Composition (${field1.value}g)`;
+        label.innerHTML = `Composition (<span id="pool">${field1.value}</span>mg)`;
     } else {
         label.style.display = 'none';
     }
@@ -138,57 +140,76 @@ document.addEventListener('DOMContentLoaded', () => {
             item.classList.toggle('selected');
         }
 
-        const temp = item.innerHTML;
-
         if (item.classList.contains('activeIngredient') && item.classList.contains('selected')) {
             const parent = item.parentElement;
-            parent.innerHTML = `<div style="width: 35px; height: 35px; margin: auto"><svg width="100%" height="100%" viewBox="0 0 100 100"><circle class="circle" cx="50" cy="50" r="30" fill="none" stroke="#FFFFFF" stroke-width="5"/></svg></div>`;
+            parent.innerHTML = `<div style="width: 40px; height: 40px; margin: auto"><svg width="100%" height="100%" viewBox="0 0 100 100"><circle class="circle" cx="50" cy="50" r="30" fill="none" stroke="#FFFFFF" stroke-width="5"/></svg></div>`;
             parent.style.backgroundColor = '#007BFF';
             setTimeout(() => {
+                item.classList.toggle('selected');
+                const listItem = document.createElement("li");
+                listItem.appendChild(item);
+
                 if (parent.parentElement.id === 'field9') {
-                    moveItemsDown(temp, item);
                     parent.remove();
+                    field10.appendChild(listItem);
+                    sortList(field10);
                     return;
                 }
 
                 if (parent.parentElement.id === 'field10') {
-                    moveItemsUp(temp, item);
+                    // Create the main container div with the class 'counter-container'
+                    const counterContainer = document.createElement('div');
+                    counterContainer.classList.add('counter-container');
+
+                    // Create the decrement button
+                    const decrementButton = document.createElement('button');
+                    decrementButton.classList.add('counter-button', 'decrement');
+                    decrementButton.textContent = '-'; // Set the text of the button
+
+                    // Create the input field to display the counter value
+                    const counterDisplay = document.createElement('input');
+                    counterDisplay.type = 'text';
+                    counterDisplay.id = 'counter';
+                    counterDisplay.classList.add('counter-display');
+                    counterDisplay.value = '0'; // Initial value
+                    counterDisplay.readOnly = true; // Set the input as read-only
+
+                    // Create the increment button
+                    const incrementButton = document.createElement('button');
+                    incrementButton.classList.add('counter-button', 'increment');
+                    incrementButton.textContent = '+';
+
+                    // Append the decrement button, counter display, and increment button to the counter container
+                    counterContainer.appendChild(decrementButton);
+                    counterContainer.appendChild(counterDisplay);
+                    counterContainer.appendChild(incrementButton);
+                    listItem.appendChild(counterContainer);
+
                     parent.remove();
+                    field9.appendChild(listItem);
+                    sortList(field9);
                     return;
                 }
             }, 500);
         }
     }
 
-    // Function to move selected items to the right
-    function moveItemsUp(temp, selectedItem) {
-        selectedItem.classList.remove('selected');
-        selectedItem.innerHTML = temp;
-        field9.appendChild(selectedItem);
-        sortList(field9);
-    }
-
-    // Function to move selected items to the left
-    function moveItemsDown(temp, selectedItem) {
-        selectedItem.classList.remove('selected');
-        selectedItem.innerHTML = temp;
-        field10.appendChild(selectedItem);
-        sortList(field10);
-    }
-
     field10.addEventListener('click', selectItem);
     field9.addEventListener('click', selectItem);
 });
 
-function sortList(list) {
-    const items = list.querySelectorAll('.activeIngredient');
-    const sortedItems = Array.from(items).sort((a, b) => a.innerText.localeCompare(b.innerText));
-    list.innerHTML = '';
-    for (let i = 0; i < sortedItems.length; i++) {
-        const listItem = document.createElement("li");
-        listItem.appendChild(sortedItems[i]);
-        list.appendChild(listItem);
-    }
+function sortList(ul) {
+    const listItems = Array.from(ul.children);
+
+    // Sort the list items based on the text content of their first child
+    listItems.sort((a, b) => {
+        const textA = a.firstElementChild.textContent.toLowerCase();
+        const textB = b.firstElementChild.textContent.toLowerCase();
+        return textA.localeCompare(textB);
+    });
+
+    // Append the sorted <li> elements back to the <ul>
+    listItems.forEach(li => ul.appendChild(li));
 }
 
 /**
@@ -201,7 +222,7 @@ async function getWeightUnits() {
     for (let i = 0; i < data.length; i++) {
         const option = document.createElement("option");
         option.value = data[i];
-        option.text = data[i] + "g";
+        option.text = data[i] + "mg";
         field1.appendChild(option);
     }
 }
@@ -253,6 +274,7 @@ async function getActiveIngredients() {
         listItem.appendChild(button);
         button.classList.add("activeIngredient");
         field10.appendChild(listItem);
-        sortList(field10);
     }
+
+    sortList(field10);
 }
