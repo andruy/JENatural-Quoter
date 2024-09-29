@@ -94,6 +94,22 @@ button:hover {
     flex: 6;
 }
 
+.counter-container {
+    display: flex;
+    flex: 4;
+    padding-left: 10px;
+}
+
+.counter-display {
+    width: 50px;
+}
+
+.counter-button {
+    width: 40px;
+    display: flex;
+    justify-content: center;
+}
+
 .smallSection {
     display: flex;
     justify-content: center;
@@ -108,6 +124,16 @@ button:hover {
     stroke-dasharray: 188.4; /* Circumference of the circle (2 * π * r) */
     stroke-dashoffset: 0;
     animation: draw .5s linear forwards;
+}
+
+@media screen and (max-width: 600px) {
+    .activeIngredient {
+        flex: 5;
+    }
+
+    .counter-container {
+        flex: 5;
+    }
 }
 
 @keyframes draw {

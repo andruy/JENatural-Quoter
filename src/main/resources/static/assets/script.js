@@ -60,10 +60,10 @@ for (let i = 4; i < 8; i++) {
     });
 }
 
-field1.addEventListener("change", resetSection2);
-field4.addEventListener("change", resetSection2);
+field1.addEventListener("change", resetSectionsBelow);
+field4.addEventListener("change", resetSectionsBelow);
 
-function resetSection2() {
+function resetSectionsBelow() {
     for (let key in bottleSizes) {
         if (bottleSizes.hasOwnProperty(key)) {
             if (key === field4.value) {
@@ -107,6 +107,8 @@ function resetSection2() {
         const item = field9.children[i].querySelector('.activeIngredient');
         item.click();
     }
+    pool.textContent = field1.value;
+    poolValue = parseInt(pool.textContent, 10);
 
     section3.style.display = "none";
 }
@@ -116,15 +118,11 @@ function resetSection2() {
  */
 const label = document.querySelector('label[for="field9"]');
 label.style.display = 'none';
+let poolValue = 0;
 
 const observer = new MutationObserver(function () {
     if (field9.querySelectorAll('li').length > 0) {
         label.style.display = 'block';
-        // const span = document.createElement('span');
-        // span.id = 'sourceValue';
-        // span.innerText = "whatever";
-        // label.insertAdjacentElement('afterend', span);
-        label.innerHTML = `Composition (<span id="pool">${field1.value}</span>mg)`;
     } else {
         label.style.display = 'none';
     }
@@ -132,20 +130,29 @@ const observer = new MutationObserver(function () {
 
 observer.observe(field9, { childList: true });
 
+// Function to update the counter and pool display
+function updatePoolDisplay() {
+    pool.textContent = poolValue;
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     // Function to handle item selection
     function selectItem(event) {
         const item = event.target;
-        if (item.classList.contains('activeIngredient')) {
-            item.classList.toggle('selected');
-        }
 
-        if (item.classList.contains('activeIngredient') && item.classList.contains('selected')) {
+        if (item.classList.contains('activeIngredient')) {
             const parent = item.parentElement;
+            if (parent.parentElement.id === 'field9') {
+                const input = item.nextElementSibling.querySelector('input');
+                if (input.value > 0) {
+                    poolValue += parseInt(input.value);
+                    updatePoolDisplay();
+                }
+            }
+
             parent.innerHTML = `<div style="width: 40px; height: 40px; margin: auto"><svg width="100%" height="100%" viewBox="0 0 100 100"><circle class="circle" cx="50" cy="50" r="30" fill="none" stroke="#FFFFFF" stroke-width="5"/></svg></div>`;
             parent.style.backgroundColor = '#007BFF';
             setTimeout(() => {
-                item.classList.toggle('selected');
                 const listItem = document.createElement("li");
                 listItem.appendChild(item);
 
@@ -163,19 +170,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     // Create the decrement button
                     const decrementButton = document.createElement('button');
+                    decrementButton.type = 'button';
                     decrementButton.classList.add('counter-button', 'decrement');
                     decrementButton.textContent = '-'; // Set the text of the button
 
                     // Create the input field to display the counter value
                     const counterDisplay = document.createElement('input');
-                    counterDisplay.type = 'text';
-                    counterDisplay.id = 'counter';
+                    counterDisplay.type = 'number';
                     counterDisplay.classList.add('counter-display');
-                    counterDisplay.value = '0'; // Initial value
-                    counterDisplay.readOnly = true; // Set the input as read-only
+                    counterDisplay.value = 0; // Initial value
+                    counterDisplay.min = 0;
+                    counterDisplay.step = 25;
 
                     // Create the increment button
                     const incrementButton = document.createElement('button');
+                    incrementButton.type = 'button';
                     incrementButton.classList.add('counter-button', 'increment');
                     incrementButton.textContent = '+';
 
@@ -191,6 +200,24 @@ document.addEventListener('DOMContentLoaded', () => {
                     return;
                 }
             }, 500);
+        } else if (item.classList.contains('increment')) {
+            const sibling = item.previousElementSibling;
+
+            // Check if enough in pool to increment
+            if (poolValue >= 25) {
+                sibling.value = parseInt(sibling.value) + 25;
+                poolValue -= 25;
+                updatePoolDisplay();
+            }
+        } else if (item.classList.contains('decrement')) {
+            const sibling = item.nextElementSibling;
+
+            // Check if the counter value is greater than 0 to decrement
+            if (sibling.value >= 25) {
+                sibling.value = parseInt(sibling.value) - 25;
+                poolValue += 25;
+                updatePoolDisplay();
+            }
         }
     }
 
