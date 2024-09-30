@@ -181,6 +181,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     counterDisplay.value = 0; // Initial value
                     counterDisplay.min = 0;
                     counterDisplay.step = 25;
+                    counterDisplay.readOnly = true;
 
                     // Create the increment button
                     const incrementButton = document.createElement('button');
