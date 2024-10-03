@@ -143,88 +143,85 @@ document.addEventListener('DOMContentLoaded', () => {
         if (item.classList.contains('activeIngredient')) {
             const parent = item.parentElement;
             if (parent.parentElement.id === 'field9') {
-                const input = item.nextElementSibling.querySelector('input');
-                if (input.value > 0) {
-                    poolValue += parseInt(input.value);
+                const select = item.nextElementSibling.querySelector('select');
+                if (select.value > 0) {
+                    poolValue += parseInt(select.value);
                     updatePoolDisplay();
                 }
             }
 
-            parent.innerHTML = `<div style="width: 40px; height: 40px; margin: auto"><svg width="100%" height="100%" viewBox="0 0 100 100"><circle class="circle" cx="50" cy="50" r="30" fill="none" stroke="#FFFFFF" stroke-width="5"/></svg></div>`;
-            parent.style.backgroundColor = '#007BFF';
-            setTimeout(() => {
-                const listItem = document.createElement("li");
-                listItem.appendChild(item);
+            if (parent.parentElement.id === 'field10' && poolValue <= 0) {
+                alert('No more ingredients available');
+            } else {
+                parent.innerHTML = `<div style="width: 40px; height: 40px; margin: auto"><svg width="100%" height="100%" viewBox="0 0 100 100"><circle class="circle" cx="50" cy="50" r="30" fill="none" stroke="#FFFFFF" stroke-width="5"/></svg></div>`;
+                parent.style.backgroundColor = '#007BFF';
+                setTimeout(() => {
+                    const listItem = document.createElement("li");
+                    listItem.appendChild(item);
 
-                if (parent.parentElement.id === 'field9') {
-                    parent.remove();
-                    field10.appendChild(listItem);
-                    sortList(field10);
-                    return;
-                }
+                    if (parent.parentElement.id === 'field9') {
+                        parent.remove();
+                        field10.appendChild(listItem);
+                        sortList(field10);
+                        return;
+                    }
 
-                if (parent.parentElement.id === 'field10') {
-                    // Create the main container div with the class 'counter-container'
-                    const counterContainer = document.createElement('div');
-                    counterContainer.classList.add('counter-container');
+                    if (parent.parentElement.id === 'field10') {
+                        const counterContainer = document.createElement('div');
+                        counterContainer.classList.add('counter-container');
 
-                    // Create the decrement button
-                    const decrementButton = document.createElement('button');
-                    decrementButton.type = 'button';
-                    decrementButton.classList.add('counter-button', 'decrement');
-                    decrementButton.textContent = '-'; // Set the text of the button
+                        const counterDisplay = document.createElement('select');
+                        counterDisplay.classList.add('counter-display');
 
-                    // Create the input field to display the counter value
-                    const counterDisplay = document.createElement('input');
-                    counterDisplay.type = 'number';
-                    counterDisplay.classList.add('counter-display');
-                    counterDisplay.value = 0; // Initial value
-                    counterDisplay.min = 0;
-                    counterDisplay.step = 25;
-                    counterDisplay.readOnly = true;
+                        counterContainer.appendChild(counterDisplay);
+                        listItem.appendChild(counterContainer);
 
-                    // Create the increment button
-                    const incrementButton = document.createElement('button');
-                    incrementButton.type = 'button';
-                    incrementButton.classList.add('counter-button', 'increment');
-                    incrementButton.textContent = '+';
+                        // counterDisplay.innerHTML = `<option value="0" selected>Add ingredient</option>`;
+                        refreshInput(counterDisplay);
+                        counterContainer.addEventListener('change', () => {
+                            poolValue += parseInt(beforeChange);
+                            poolValue -= parseInt(counterDisplay.value);
+                            updatePoolDisplay();
+                            refreshInput(counterDisplay);
+                        })
 
-                    // Append the decrement button, counter display, and increment button to the counter container
-                    counterContainer.appendChild(decrementButton);
-                    counterContainer.appendChild(counterDisplay);
-                    counterContainer.appendChild(incrementButton);
-                    listItem.appendChild(counterContainer);
-
-                    parent.remove();
-                    field9.appendChild(listItem);
-                    sortList(field9);
-                    return;
-                }
-            }, 500);
-        } else if (item.classList.contains('increment')) {
-            const sibling = item.previousElementSibling;
-
-            // Check if enough in pool to increment
-            if (poolValue >= 25) {
-                sibling.value = parseInt(sibling.value) + 25;
-                poolValue -= 25;
-                updatePoolDisplay();
+                        parent.remove();
+                        field9.appendChild(listItem);
+                        sortList(field9);
+                        return;
+                    }
+                }, 500);
             }
-        } else if (item.classList.contains('decrement')) {
-            const sibling = item.nextElementSibling;
-
-            // Check if the counter value is greater than 0 to decrement
-            if (sibling.value >= 25) {
-                sibling.value = parseInt(sibling.value) - 25;
-                poolValue += 25;
-                updatePoolDisplay();
-            }
+        } else if (item.classList.contains('counter-display')) {
+            refreshInput(item);
         }
     }
 
     field10.addEventListener('click', selectItem);
     field9.addEventListener('click', selectItem);
 });
+
+let beforeChange;
+
+function refreshInput(select) {
+    select.firstChild && select.value > 0 ? beforeChange = select.value : beforeChange = 0;
+    console.log("Before change: " + beforeChange);
+    console.log("Select value: " + select.value);
+    console.log("Pool value: " + poolValue);
+    
+    while (select.firstChild) {
+        select.removeChild(select.firstChild);
+    }
+
+    for (let i = 25; i <= poolValue; i += 25) {
+        const option = document.createElement("option");
+        option.value = i;
+        option.text = i + " mg";
+        select.appendChild(option);
+    }
+
+    select.value = beforeChange;
+}
 
 function sortList(ul) {
     const listItems = Array.from(ul.children);
@@ -250,7 +247,7 @@ async function getWeightUnits() {
     for (let i = 0; i < data.length; i++) {
         const option = document.createElement("option");
         option.value = data[i];
-        option.text = data[i] + "mg";
+        option.text = data[i] + " mg";
         field1.appendChild(option);
     }
 }
