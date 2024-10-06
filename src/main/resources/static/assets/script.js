@@ -116,15 +116,16 @@ function resetSectionsBelow() {
 /**
  * Active ingredients
  */
-const label = document.querySelector('label[for="field9"]');
-label.style.display = 'none';
+const label10 = document.querySelector('label[for="field10"]');
+const label9 = document.querySelector('label[for="field9"]');
+label9.style.display = 'none';
 let poolValue = 0;
 
 const observer = new MutationObserver(function () {
     if (field9.querySelectorAll('li').length > 0) {
-        label.style.display = 'block';
+        label9.style.display = 'block';
     } else {
-        label.style.display = 'none';
+        label9.style.display = 'none';
     }
 });
 
@@ -151,7 +152,13 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             if (parent.parentElement.id === 'field10' && poolValue <= 0) {
-                alert('No more ingredients available');
+                event.preventDefault();
+                const temp = item.innerText;
+                item.innerText = "No more sources available";
+                setTimeout(() => {
+                    item.innerText = temp;
+                    item.blur();
+                }, 1500);
             } else {
                 parent.innerHTML = `<div style="width: 40px; height: 40px; margin: auto"><svg width="100%" height="100%" viewBox="0 0 100 100"><circle class="circle" cx="50" cy="50" r="30" fill="none" stroke="#FFFFFF" stroke-width="5"/></svg></div>`;
                 parent.style.backgroundColor = '#007BFF';
@@ -176,14 +183,23 @@ document.addEventListener('DOMContentLoaded', () => {
                         counterContainer.appendChild(counterDisplay);
                         listItem.appendChild(counterContainer);
 
-                        // counterDisplay.innerHTML = `<option value="0" selected>Add ingredient</option>`;
+                        counterDisplay.innerHTML = `<option value="0" selected>Add ingredient</option>`;
                         refreshInput(counterDisplay);
-                        counterContainer.addEventListener('change', () => {
-                            poolValue += parseInt(beforeChange);
-                            poolValue -= parseInt(counterDisplay.value);
-                            updatePoolDisplay();
+
+                        counterDisplay.addEventListener('focus', () => {
+                            counterDisplay.value ? beforeChange = counterDisplay.value : beforeChange = 0;
                             refreshInput(counterDisplay);
-                        })
+                        });
+
+                        counterDisplay.addEventListener('change', () => {
+                            if (counterDisplay.value != beforeChange) {
+                                poolValue += parseInt(beforeChange);
+                                poolValue -= parseInt(counterDisplay.value);
+                                refreshInput(counterDisplay);
+                                beforeChange = counterDisplay.value;
+                                updatePoolDisplay();
+                            }
+                        });
 
                         parent.remove();
                         field9.appendChild(listItem);
@@ -192,8 +208,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 }, 500);
             }
-        } else if (item.classList.contains('counter-display')) {
-            refreshInput(item);
         }
     }
 
@@ -203,24 +217,29 @@ document.addEventListener('DOMContentLoaded', () => {
 
 let beforeChange;
 
-function refreshInput(select) {
-    select.firstChild && select.value > 0 ? beforeChange = select.value : beforeChange = 0;
-    console.log("Before change: " + beforeChange);
-    console.log("Select value: " + select.value);
-    console.log("Pool value: " + poolValue);
-    
-    while (select.firstChild) {
-        select.removeChild(select.firstChild);
+function refreshInput(item) {
+    let preserve = item.value;
+
+    while (item.firstChild) {
+        item.removeChild(item.firstChild);
     }
 
-    for (let i = 25; i <= poolValue; i += 25) {
+    const goal = poolValue + parseInt(preserve);
+
+    for (let i = 0; i <= goal; i += 25) {
         const option = document.createElement("option");
         option.value = i;
         option.text = i + " mg";
-        select.appendChild(option);
+        item.appendChild(option);
     }
 
-    select.value = beforeChange;
+    const options = item.options;
+    for (let i = 0; i < options.length; i++) {
+        if (options[i].value == preserve) {
+            options[i].selected = true;
+            break;
+        }
+    }
 }
 
 function sortList(ul) {
