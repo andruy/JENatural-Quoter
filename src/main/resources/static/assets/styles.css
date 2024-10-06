@@ -101,7 +101,7 @@ button:hover {
 }
 
 .counter-display {
-    width: 50px;
+    text-align: center;
 }
 
 .counter-button {

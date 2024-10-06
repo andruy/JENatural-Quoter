@@ -116,15 +116,16 @@ function resetSectionsBelow() {
 /**
  * Active ingredients
  */
-const label = document.querySelector('label[for="field9"]');
-label.style.display = 'none';
+const label10 = document.querySelector('label[for="field10"]');
+const label9 = document.querySelector('label[for="field9"]');
+label9.style.display = 'none';
 let poolValue = 0;
 
 const observer = new MutationObserver(function () {
     if (field9.querySelectorAll('li').length > 0) {
-        label.style.display = 'block';
+        label9.style.display = 'block';
     } else {
-        label.style.display = 'none';
+        label9.style.display = 'none';
     }
 });
 
@@ -143,81 +144,69 @@ document.addEventListener('DOMContentLoaded', () => {
         if (item.classList.contains('activeIngredient')) {
             const parent = item.parentElement;
             if (parent.parentElement.id === 'field9') {
-                const input = item.nextElementSibling.querySelector('input');
-                if (input.value > 0) {
-                    poolValue += parseInt(input.value);
+                const select = item.nextElementSibling.querySelector('select');
+                if (select.value > 0) {
+                    poolValue += parseInt(select.value);
                     updatePoolDisplay();
                 }
             }
 
-            parent.innerHTML = `<div style="width: 40px; height: 40px; margin: auto"><svg width="100%" height="100%" viewBox="0 0 100 100"><circle class="circle" cx="50" cy="50" r="30" fill="none" stroke="#FFFFFF" stroke-width="5"/></svg></div>`;
-            parent.style.backgroundColor = '#007BFF';
-            setTimeout(() => {
-                const listItem = document.createElement("li");
-                listItem.appendChild(item);
+            if (parent.parentElement.id === 'field10' && poolValue <= 0) {
+                event.preventDefault();
+                const temp = item.innerText;
+                item.innerText = "No more sources available";
+                setTimeout(() => {
+                    item.innerText = temp;
+                    item.blur();
+                }, 1500);
+            } else {
+                parent.innerHTML = `<div style="width: 40px; height: 40px; margin: auto"><svg width="100%" height="100%" viewBox="0 0 100 100"><circle class="circle" cx="50" cy="50" r="30" fill="none" stroke="#FFFFFF" stroke-width="5"/></svg></div>`;
+                parent.style.backgroundColor = '#007BFF';
+                setTimeout(() => {
+                    const listItem = document.createElement("li");
+                    listItem.appendChild(item);
 
-                if (parent.parentElement.id === 'field9') {
-                    parent.remove();
-                    field10.appendChild(listItem);
-                    sortList(field10);
-                    return;
-                }
+                    if (parent.parentElement.id === 'field9') {
+                        parent.remove();
+                        field10.appendChild(listItem);
+                        sortList(field10);
+                        return;
+                    }
 
-                if (parent.parentElement.id === 'field10') {
-                    // Create the main container div with the class 'counter-container'
-                    const counterContainer = document.createElement('div');
-                    counterContainer.classList.add('counter-container');
+                    if (parent.parentElement.id === 'field10') {
+                        const counterContainer = document.createElement('div');
+                        counterContainer.classList.add('counter-container');
 
-                    // Create the decrement button
-                    const decrementButton = document.createElement('button');
-                    decrementButton.type = 'button';
-                    decrementButton.classList.add('counter-button', 'decrement');
-                    decrementButton.textContent = '-'; // Set the text of the button
+                        const counterDisplay = document.createElement('select');
+                        counterDisplay.classList.add('counter-display');
 
-                    // Create the input field to display the counter value
-                    const counterDisplay = document.createElement('input');
-                    counterDisplay.type = 'number';
-                    counterDisplay.classList.add('counter-display');
-                    counterDisplay.value = 0; // Initial value
-                    counterDisplay.min = 0;
-                    counterDisplay.step = 25;
-                    counterDisplay.readOnly = true;
+                        counterContainer.appendChild(counterDisplay);
+                        listItem.appendChild(counterContainer);
 
-                    // Create the increment button
-                    const incrementButton = document.createElement('button');
-                    incrementButton.type = 'button';
-                    incrementButton.classList.add('counter-button', 'increment');
-                    incrementButton.textContent = '+';
+                        counterDisplay.innerHTML = `<option value="0" selected>Add ingredient</option>`;
+                        refreshInput(counterDisplay);
 
-                    // Append the decrement button, counter display, and increment button to the counter container
-                    counterContainer.appendChild(decrementButton);
-                    counterContainer.appendChild(counterDisplay);
-                    counterContainer.appendChild(incrementButton);
-                    listItem.appendChild(counterContainer);
+                        counterDisplay.addEventListener('focus', () => {
+                            counterDisplay.value ? beforeChange = counterDisplay.value : beforeChange = 0;
+                            refreshInput(counterDisplay);
+                        });
 
-                    parent.remove();
-                    field9.appendChild(listItem);
-                    sortList(field9);
-                    return;
-                }
-            }, 500);
-        } else if (item.classList.contains('increment')) {
-            const sibling = item.previousElementSibling;
+                        counterDisplay.addEventListener('change', () => {
+                            if (counterDisplay.value != beforeChange) {
+                                poolValue += parseInt(beforeChange);
+                                poolValue -= parseInt(counterDisplay.value);
+                                refreshInput(counterDisplay);
+                                beforeChange = counterDisplay.value;
+                                updatePoolDisplay();
+                            }
+                        });
 
-            // Check if enough in pool to increment
-            if (poolValue >= 25) {
-                sibling.value = parseInt(sibling.value) + 25;
-                poolValue -= 25;
-                updatePoolDisplay();
-            }
-        } else if (item.classList.contains('decrement')) {
-            const sibling = item.nextElementSibling;
-
-            // Check if the counter value is greater than 0 to decrement
-            if (sibling.value >= 25) {
-                sibling.value = parseInt(sibling.value) - 25;
-                poolValue += 25;
-                updatePoolDisplay();
+                        parent.remove();
+                        field9.appendChild(listItem);
+                        sortList(field9);
+                        return;
+                    }
+                }, 500);
             }
         }
     }
@@ -225,6 +214,33 @@ document.addEventListener('DOMContentLoaded', () => {
     field10.addEventListener('click', selectItem);
     field9.addEventListener('click', selectItem);
 });
+
+let beforeChange;
+
+function refreshInput(item) {
+    let preserve = item.value;
+
+    while (item.firstChild) {
+        item.removeChild(item.firstChild);
+    }
+
+    const goal = poolValue + parseInt(preserve);
+
+    for (let i = 0; i <= goal; i += 25) {
+        const option = document.createElement("option");
+        option.value = i;
+        option.text = i + " mg";
+        item.appendChild(option);
+    }
+
+    const options = item.options;
+    for (let i = 0; i < options.length; i++) {
+        if (options[i].value == preserve) {
+            options[i].selected = true;
+            break;
+        }
+    }
+}
 
 function sortList(ul) {
     const listItems = Array.from(ul.children);
@@ -250,7 +266,7 @@ async function getWeightUnits() {
     for (let i = 0; i < data.length; i++) {
         const option = document.createElement("option");
         option.value = data[i];
-        option.text = data[i] + "mg";
+        option.text = data[i] + " mg";
         field1.appendChild(option);
     }
 }
