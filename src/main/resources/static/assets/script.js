@@ -116,16 +116,15 @@ function resetSectionsBelow() {
 /**
  * Active ingredients
  */
-const label10 = document.querySelector('label[for="field10"]');
-const label9 = document.querySelector('label[for="field9"]');
-label9.style.display = 'none';
+const label = document.querySelector('label[for="field9"]');
+label.style.display = 'none';
 let poolValue = 0;
 
 const observer = new MutationObserver(function () {
     if (field9.querySelectorAll('li').length > 0) {
-        label9.style.display = 'block';
+        label.style.display = 'inline-block';
     } else {
-        label9.style.display = 'none';
+        label.style.display = 'none';
     }
 });
 
@@ -134,7 +133,26 @@ observer.observe(field9, { childList: true });
 // Function to update the counter and pool display
 function updatePoolDisplay() {
     pool.textContent = poolValue;
+
+    if (poolValue == 0) {
+        const list = document.querySelectorAll('.counter-display');
+        
+        list.forEach(item => {
+            if (item.value <= 0) {
+                item.parentElement.parentElement.firstChild.click();
+            }
+        });
+
+        label.insertAdjacentElement('afterend', sendButton);
+    } else {
+        sendButton.remove();
+    }
 }
+
+const sendButton = document.createElement('button');
+sendButton.type = 'submit';
+sendButton.id = 'sendButton';
+sendButton.textContent = 'Send';
 
 document.addEventListener('DOMContentLoaded', () => {
     // Function to handle item selection
@@ -183,21 +201,28 @@ document.addEventListener('DOMContentLoaded', () => {
                         counterContainer.appendChild(counterDisplay);
                         listItem.appendChild(counterContainer);
 
-                        counterDisplay.innerHTML = `<option value="0" selected>Add ingredient</option>`;
-                        refreshInput(counterDisplay);
+                        counterDisplay.innerHTML = `<option value="-1" disabled selected hidden>Add ingredient</option>`;
 
                         counterDisplay.addEventListener('focus', () => {
-                            counterDisplay.value ? beforeChange = counterDisplay.value : beforeChange = 0;
+                            beforeChange = counterDisplay.value;
                             refreshInput(counterDisplay);
                         });
 
-                        counterDisplay.addEventListener('change', () => {
+                        counterDisplay.addEventListener('input', () => {
                             if (counterDisplay.value != beforeChange) {
+                                if (beforeChange == -1) {
+                                    beforeChange = 0;
+                                }
+
                                 poolValue += parseInt(beforeChange);
                                 poolValue -= parseInt(counterDisplay.value);
                                 refreshInput(counterDisplay);
                                 beforeChange = counterDisplay.value;
                                 updatePoolDisplay();
+
+                                if (counterDisplay.value == 0) {
+                                    item.click();
+                                }
                             }
                         });
 
@@ -220,11 +245,9 @@ let beforeChange;
 function refreshInput(item) {
     let preserve = item.value;
 
-    while (item.firstChild) {
-        item.removeChild(item.firstChild);
-    }
+    item.innerHTML = `<option value="-1" disabled selected hidden>Add ingredient</option>`;
 
-    const goal = poolValue + parseInt(preserve);
+    const goal = poolValue + parseInt(preserve == -1 ? 0 : preserve);
 
     for (let i = 0; i <= goal; i += 25) {
         const option = document.createElement("option");
@@ -239,6 +262,8 @@ function refreshInput(item) {
             options[i].selected = true;
             break;
         }
+    }
+    if (preserve >= 0) {
     }
 }
 

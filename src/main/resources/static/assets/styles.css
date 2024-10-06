@@ -110,6 +110,10 @@ button:hover {
     justify-content: center;
 }
 
+#sendButton {
+    float: right;
+}
+
 .smallSection {
     display: flex;
     justify-content: center;
