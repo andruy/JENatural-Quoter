@@ -100,7 +100,7 @@ button:hover {
     padding-left: 10px;
 }
 
-.counter-display {
+.counter-display, .small-counter-display {
     text-align: center;
 }
 
