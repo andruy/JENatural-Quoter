@@ -1,14 +1,17 @@
 package com.jenatural.quoter.services;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Scanner;
 
+import org.json.JSONObject;
 import org.springframework.stereotype.Service;
 
 import com.jenatural.quoter.models.Bottle;
-import com.jenatural.quoter.models.BottleCap;
 import com.jenatural.quoter.models.BottleCapType;
 import com.jenatural.quoter.models.BottleAndCapColor;
 import com.jenatural.quoter.models.BottleSize;
@@ -17,6 +20,8 @@ import com.jenatural.quoter.models.Weight;
 
 @Service
 public class UnitsService {
+    private final String TEMPLATE = parseJsonFile("list.json");
+
     public List<Integer> getWeightUnits() {
         List<Integer> weightList = new ArrayList<>();
         for (Weight w : Weight.values()) {
@@ -45,10 +50,10 @@ public class UnitsService {
         return capsuleQuantity / capsulesPerBottle;
     }
 
-    public List<BottleCap> getBottleCapTypes() {
-        List<BottleCap> options = new ArrayList<>();
+    public List<String> getBottleCapTypes() {
+        List<String> options = new ArrayList<>();
         for (BottleCapType b : BottleCapType.values()) {
-            options.add(b.getBottleCap());
+            options.add(b.toString());
         }
         return options;
     }
@@ -63,16 +68,35 @@ public class UnitsService {
 
     public List<String> getActiveIngredients() {
         List<String> ingredients = new ArrayList<>();
-        ingredients.add("Vitamin C");
-        ingredients.add("Vitamin E");
-        ingredients.add("Vitamin K");
-        ingredients.add("Vitamin A");
-        ingredients.add("Vitamin B");
-        ingredients.add("Vitamin D");
-        ingredients.add("Vitamin B12");
-        ingredients.add("Vitamin B6");
-        ingredients.add("Vitamin B9");
-        ingredients.add("Vitamin B5");
+        JSONObject jsonObject = new JSONObject(TEMPLATE).getJSONObject("Ingredients");
+        for (String key : jsonObject.keySet()) {
+            ingredients.add(key);
+        }
         return ingredients;
+    }
+
+    public List<String> getSmallIngredients() {
+        List<String> ingredients = new ArrayList<>();
+        JSONObject jsonObject = new JSONObject(TEMPLATE).getJSONObject("SmallIngredients");
+        for (String key : jsonObject.keySet()) {
+            ingredients.add(key);
+        }
+        return ingredients;
+    }
+
+    private String parseJsonFile(String file) {
+        StringBuilder sb = new StringBuilder();
+
+        try {
+            Scanner scanner = new Scanner(new File(file));
+            while (scanner.hasNextLine()) {
+                sb.append(scanner.nextLine());
+            }
+            scanner.close();
+        } catch (FileNotFoundException  e) {
+            e.printStackTrace();
+        }
+
+        return sb.toString();
     }
 }

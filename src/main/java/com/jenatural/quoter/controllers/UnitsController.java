@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.jenatural.quoter.models.Bottle;
-import com.jenatural.quoter.models.BottleCap;
 import com.jenatural.quoter.services.UnitsService;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -39,7 +38,7 @@ public class UnitsController {
     }
 
     @GetMapping("/bottleCapTypes")
-    public ResponseEntity<List<BottleCap>> getBottleCapTypes() {
+    public ResponseEntity<List<String>> getBottleCapTypes() { // TODO
         return ResponseEntity.ok(unitsService.getBottleCapTypes());
     }
 
@@ -51,5 +50,10 @@ public class UnitsController {
     @GetMapping("/activeIngredients")
     public ResponseEntity<List<String>> getActiveIngredients(String param) {
         return ResponseEntity.ok(unitsService.getActiveIngredients());
+    }
+
+    @GetMapping("/smallIngredients")
+    public ResponseEntity<List<String>> getSmallIngredients() {
+        return ResponseEntity.ok(unitsService.getSmallIngredients());
     }
 }

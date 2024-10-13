@@ -19,7 +19,8 @@ const endpoints = {
     capTypes: root + "capTypes",
     bottleCapTypes: root + "bottleCapTypes",
     bottleAndCapColors: root + "bottleAndCapColors",
-    activeIngredients: root + "activeIngredients"
+    activeIngredients: root + "activeIngredients",
+    smallIngredients: root + "smallIngredients"
 }
 
 document.onload = getWeightUnits();
@@ -28,11 +29,16 @@ document.onload = getBottleSizes();
 document.onload = getBottleCapTypes();
 document.onload = getBottleAndCapColors();
 document.onload = getActiveIngredients();
+document.onload = getSmallIngredients();
+document.onload = setTimeout(() => {
+    sortList(field11);
+}, 2000);
 
 let bottleSizes;
 let bottleCapTypes;
 let bottleAndCapColors;
 let activeIngredients;
+let smallIngredients;
 
 for (let i = 0; i < 4; i++) {
     document.querySelectorAll(".form-group")[i].addEventListener("change", function () {
@@ -78,8 +84,8 @@ function resetSectionsBelow() {
                 field6.innerHTML = `<option value="" disabled selected hidden>Bottle cap type</option>`;
                 bottleCapTypes.forEach(element => {
                     const option = document.createElement("option");
-                    option.value = element.type;
-                    option.text = element.type;
+                    option.value = element;
+                    option.text = element;
                     field6.appendChild(option);
                 });
 
@@ -102,9 +108,9 @@ function resetSectionsBelow() {
         }
     }
 
-    // Move all items down from field9 to field10
-    for (let i = 0; i < field9.children.length; i++) {
-        const item = field9.children[i].querySelector('.activeIngredient');
+    // Move all items down from field10 to field11
+    for (let i = 0; i < field10.children.length; i++) {
+        const item = field10.children[i].querySelector('.activeIngredient');
         item.click();
     }
     pool.textContent = field1.value;
@@ -116,22 +122,34 @@ function resetSectionsBelow() {
 /**
  * Active ingredients
  */
-const label = document.querySelector('label[for="field9"]');
-label.style.display = 'none';
+const label9 = document.querySelector('label[for="field9"]');
+label9.style.display = 'none';
+
+const label10 = document.querySelector('label[for="field10"]');
+label10.style.display = 'none';
+
 let poolValue = 0;
 
 const observer = new MutationObserver(function () {
     if (field9.querySelectorAll('li').length > 0) {
-        label.style.display = 'inline-block';
+        label9.style.display = 'block';
     } else {
-        label.style.display = 'none';
+        label9.style.display = 'none';
+    }
+
+    if (field10.querySelectorAll('li').length > 0) {
+        label10.style.display = 'block';
+    } else {
+        label10.style.display = 'none';
     }
 });
 
 observer.observe(field9, { childList: true });
+observer.observe(field10, { childList: true });
 
 // Function to update the counter and pool display
 function updatePoolDisplay() {
+    const header = document.querySelectorAll('.smallSection')[2];
     pool.textContent = poolValue;
 
     if (poolValue == 0) {
@@ -143,25 +161,22 @@ function updatePoolDisplay() {
             }
         });
 
-        label.insertAdjacentElement('afterend', sendButton);
+        header.style.display = 'none';
+        sendButton.style.display = 'block';
     } else {
-        sendButton.remove();
+        sendButton.style.display = 'none';
+        header.style.display = 'flex';
     }
 }
-
-const sendButton = document.createElement('button');
-sendButton.type = 'submit';
-sendButton.id = 'sendButton';
-sendButton.textContent = 'Send';
 
 document.addEventListener('DOMContentLoaded', () => {
     // Function to handle item selection
     function selectItem(event) {
         const item = event.target;
 
-        if (item.classList.contains('activeIngredient')) {
+        if (item.classList.contains('activeIngredient') || item.classList.contains('smallIngredient')) {
             const parent = item.parentElement;
-            if (parent.parentElement.id === 'field9') {
+            if (parent.parentElement.id === 'field10') {
                 const select = item.nextElementSibling.querySelector('select');
                 if (select.value > 0) {
                     poolValue += parseInt(select.value);
@@ -169,7 +184,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
 
-            if (parent.parentElement.id === 'field10' && poolValue <= 0) {
+            if (parent.parentElement.id === 'field11' && poolValue <= 0 && item.classList.contains('activeIngredient')) {
                 event.preventDefault();
                 const temp = item.innerText;
                 item.innerText = "No more sources available";
@@ -184,14 +199,14 @@ document.addEventListener('DOMContentLoaded', () => {
                     const listItem = document.createElement("li");
                     listItem.appendChild(item);
 
-                    if (parent.parentElement.id === 'field9') {
+                    if (parent.parentElement.id === 'field9' || parent.parentElement.id === 'field10') {
                         parent.remove();
-                        field10.appendChild(listItem);
-                        sortList(field10);
+                        field11.appendChild(listItem);
+                        sortList(field11);
                         return;
                     }
 
-                    if (parent.parentElement.id === 'field10') {
+                    if (parent.parentElement.id === 'field11' && item.classList.contains('activeIngredient')) {
                         const counterContainer = document.createElement('div');
                         counterContainer.classList.add('counter-container');
 
@@ -227,6 +242,52 @@ document.addEventListener('DOMContentLoaded', () => {
                         });
 
                         parent.remove();
+                        field10.appendChild(listItem);
+                        sortList(field10);
+                        return;
+                    }
+
+                    if (parent.parentElement.id === 'field11' && item.classList.contains('smallIngredient')) {
+                        const counterContainer = document.createElement('div');
+                        counterContainer.classList.add('counter-container');
+
+                        const decrementButton = document.createElement('button');
+                        decrementButton.type = 'button';
+                        decrementButton.classList.add('counter-button');
+                        decrementButton.textContent = '-';
+
+                        const counterDisplay = document.createElement('input');
+                        counterDisplay.type = 'number';
+                        counterDisplay.classList.add('small-counter-display');
+                        counterDisplay.value = 0;
+                        counterDisplay.min = 0;
+                        counterDisplay.max = 100;
+                        counterDisplay.step = 25;
+                        counterDisplay.readOnly = true;
+
+                        const incrementButton = document.createElement('button');
+                        incrementButton.type = 'button';
+                        incrementButton.classList.add('counter-button');
+                        incrementButton.textContent = '+';
+
+                        counterContainer.appendChild(decrementButton);
+                        counterContainer.appendChild(counterDisplay);
+                        counterContainer.appendChild(incrementButton);
+                        listItem.appendChild(counterContainer);
+
+                        decrementButton.addEventListener('click', () => {
+                            if (counterDisplay.value != counterDisplay.min) {
+                                counterDisplay.value = parseInt(counterDisplay.value) - 25;
+                            }
+                        });
+
+                        incrementButton.addEventListener('click', () => {
+                            if (counterDisplay.value != counterDisplay.max) {
+                                counterDisplay.value = parseInt(counterDisplay.value) + 25;
+                            }
+                        });
+
+                        parent.remove();
                         field9.appendChild(listItem);
                         sortList(field9);
                         return;
@@ -236,8 +297,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    field10.addEventListener('click', selectItem);
     field9.addEventListener('click', selectItem);
+    field10.addEventListener('click', selectItem);
+    field11.addEventListener('click', selectItem);
 });
 
 let beforeChange;
@@ -262,8 +324,6 @@ function refreshInput(item) {
             options[i].selected = true;
             break;
         }
-    }
-    if (preserve >= 0) {
     }
 }
 
@@ -342,8 +402,20 @@ async function getActiveIngredients() {
         const listItem = document.createElement("li");
         listItem.appendChild(button);
         button.classList.add("activeIngredient");
-        field10.appendChild(listItem);
+        field11.appendChild(listItem);
     }
+}
 
-    sortList(field10);
+async function getSmallIngredients() {
+    const response = await fetch(endpoints.smallIngredients);
+    smallIngredients = await response.json();
+
+    for (let i = 0; i < smallIngredients.length; i++) {
+        const button = document.createElement("button");
+        button.appendChild(document.createTextNode(smallIngredients[i]));
+        const listItem = document.createElement("li");
+        listItem.appendChild(button);
+        button.classList.add("smallIngredient");
+        field11.appendChild(listItem);
+    }
 }

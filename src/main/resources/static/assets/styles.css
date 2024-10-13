@@ -90,7 +90,7 @@ button:hover {
     background-color: #0056b3; /* Darker accent color on hover */
 }
 
-.activeIngredient {
+.activeIngredient, .smallIngredient {
     flex: 6;
 }
 
@@ -111,7 +111,9 @@ button:hover {
 }
 
 #sendButton {
-    float: right;
+    display: none;
+    margin: 0.45em auto;
+    font-size: 1rem;
 }
 
 .smallSection {
@@ -131,7 +133,7 @@ button:hover {
 }
 
 @media screen and (max-width: 600px) {
-    .activeIngredient {
+    .activeIngredient, .smallIngredient {
         flex: 5;
     }
 
