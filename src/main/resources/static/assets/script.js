@@ -23,6 +23,7 @@ const endpoints = {
     smallIngredients: root + "smallIngredients"
 }
 
+document.onload = populateQuantity();
 document.onload = getWeightUnits();
 document.onload = getCapTypes();
 document.onload = getBottleSizes();
@@ -339,6 +340,15 @@ function sortList(ul) {
 
     // Append the sorted <li> elements back to the <ul>
     listItems.forEach(li => ul.appendChild(li));
+}
+
+function populateQuantity() {
+    for (let i = 30; i < 1000; i += 10) {
+        const option = document.createElement("option");
+        option.value = i * 1000;
+        option.text = i + "k";
+        field3.appendChild(option);
+    }
 }
 
 /**
