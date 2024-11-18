@@ -1,4 +1,4 @@
-package com.jenatural.quoter.models;
+package com.jenatural.quoter.model;
 
 public enum BottleAndCapColor {
     WHITE,

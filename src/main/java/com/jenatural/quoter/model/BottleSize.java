@@ -1,4 +1,4 @@
-package com.jenatural.quoter.models;
+package com.jenatural.quoter.model;
 
 import java.util.List;
 
