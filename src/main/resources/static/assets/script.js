@@ -20,9 +20,11 @@ const endpoints = {
     bottleCapTypes: root + "bottleCapTypes",
     bottleAndCapColors: root + "bottleAndCapColors",
     activeIngredients: root + "activeIngredients",
-    smallIngredients: root + "smallIngredients"
+    smallIngredients: root + "smallIngredients",
+    submit: root + "submit"
 }
 
+document.onload = populateQuantity();
 document.onload = getWeightUnits();
 document.onload = getCapTypes();
 document.onload = getBottleSizes();
@@ -32,7 +34,7 @@ document.onload = getActiveIngredients();
 document.onload = getSmallIngredients();
 document.onload = setTimeout(() => {
     sortList(field11);
-}, 2000);
+}, 5000);
 
 let bottleSizes;
 let bottleCapTypes;
@@ -41,7 +43,7 @@ let activeIngredients;
 let smallIngredients;
 
 for (let i = 0; i < 4; i++) {
-    document.querySelectorAll(".form-group")[i].addEventListener("change", function () {
+    document.querySelectorAll(".form-group")[i].addEventListener("change", () => {
         if (field1.value != "" && field2.value != "" && field3.value != "" && field4.value != "") {
             section2.style.display = "block";
         } else {
@@ -50,14 +52,14 @@ for (let i = 0; i < 4; i++) {
     });
 }
 
-document.querySelectorAll(".form-group")[3].addEventListener("change", function () {
+document.querySelectorAll(".form-group")[3].addEventListener("change", () => {
     if (field4.value != "") {
         section3.style.display = "none";
     }
 })
 
 for (let i = 4; i < 8; i++) {
-    document.querySelectorAll(".form-group")[i].addEventListener("change", function () {
+    document.querySelectorAll(".form-group")[i].addEventListener("change", () => {
         if (field5.value != "" && field6.value != "" && field7.value != "" && field8.value != "") {
             section3.style.display = "block";
         } else {
@@ -130,7 +132,7 @@ label10.style.display = 'none';
 
 let poolValue = 0;
 
-const observer = new MutationObserver(function () {
+const observer = new MutationObserver(() => {
     if (field9.querySelectorAll('li').length > 0) {
         label9.style.display = 'block';
     } else {
@@ -149,7 +151,6 @@ observer.observe(field10, { childList: true });
 
 // Function to update the counter and pool display
 function updatePoolDisplay() {
-    const header = document.querySelectorAll('.smallSection')[2];
     pool.textContent = poolValue;
 
     if (poolValue == 0) {
@@ -161,11 +162,9 @@ function updatePoolDisplay() {
             }
         });
 
-        header.style.display = 'none';
         sendButton.style.display = 'block';
     } else {
         sendButton.style.display = 'none';
-        header.style.display = 'flex';
     }
 }
 
@@ -251,39 +250,23 @@ document.addEventListener('DOMContentLoaded', () => {
                         const counterContainer = document.createElement('div');
                         counterContainer.classList.add('counter-container');
 
-                        const decrementButton = document.createElement('button');
-                        decrementButton.type = 'button';
-                        decrementButton.classList.add('counter-button');
-                        decrementButton.textContent = '-';
-
-                        const counterDisplay = document.createElement('input');
-                        counterDisplay.type = 'number';
+                        const counterDisplay = document.createElement('select');
                         counterDisplay.classList.add('small-counter-display');
-                        counterDisplay.value = 0;
-                        counterDisplay.min = 0;
-                        counterDisplay.max = 100;
-                        counterDisplay.step = 25;
-                        counterDisplay.readOnly = true;
 
-                        const incrementButton = document.createElement('button');
-                        incrementButton.type = 'button';
-                        incrementButton.classList.add('counter-button');
-                        incrementButton.textContent = '+';
-
-                        counterContainer.appendChild(decrementButton);
                         counterContainer.appendChild(counterDisplay);
-                        counterContainer.appendChild(incrementButton);
                         listItem.appendChild(counterContainer);
 
-                        decrementButton.addEventListener('click', () => {
-                            if (counterDisplay.value != counterDisplay.min) {
-                                counterDisplay.value = parseInt(counterDisplay.value) - 25;
-                            }
-                        });
+                        counterDisplay.innerHTML = `<option value="-1" disabled selected hidden>Add ingredient</option>`;
+                        for (let i = 25; i <= 100; i += 25) {
+                            const option = document.createElement("option");
+                            option.value = i;
+                            option.text = i + "%";
+                            counterDisplay.appendChild(option);
+                        }
 
-                        incrementButton.addEventListener('click', () => {
-                            if (counterDisplay.value != counterDisplay.max) {
-                                counterDisplay.value = parseInt(counterDisplay.value) + 25;
+                        counterDisplay.addEventListener('input', () => {
+                            if (counterDisplay.value == 0) {
+                                item.click();
                             }
                         });
 
@@ -311,7 +294,7 @@ function refreshInput(item) {
 
     const goal = poolValue + parseInt(preserve == -1 ? 0 : preserve);
 
-    for (let i = 0; i <= goal; i += 25) {
+    for (let i = 25; i <= goal; i += 25) {
         const option = document.createElement("option");
         option.value = i;
         option.text = i + " mg";
@@ -339,6 +322,15 @@ function sortList(ul) {
 
     // Append the sorted <li> elements back to the <ul>
     listItems.forEach(li => ul.appendChild(li));
+}
+
+function populateQuantity() {
+    for (let i = 30; i < 1000; i += 10) {
+        const option = document.createElement("option");
+        option.value = i * 1000;
+        option.text = i + "k";
+        field3.appendChild(option);
+    }
 }
 
 /**
@@ -418,4 +410,59 @@ async function getSmallIngredients() {
         button.classList.add("smallIngredient");
         field11.appendChild(listItem);
     }
+}
+
+sendButton.addEventListener('click', event => {
+    event.preventDefault();
+    // event.target.disabled = true;
+    if (checkField9()) {
+        let smallList = {};
+        for (let i = 0; i < field9.children.length; i++) {
+            const item = field9.children[i].querySelector('.smallIngredient');
+            smallList[item.innerText] = field9.children[i].querySelector('.small-counter-display').value;
+        }
+    
+        let activeList = {};
+        for (let i = 0; i < field10.children.length; i++) {
+            const item = field10.children[i].querySelector('.activeIngredient');
+            activeList[item.innerText] = field10.children[i].querySelector('.counter-display').value;
+        }
+    
+        sendQuote(smallList, activeList);
+    }
+});
+
+async function sendQuote(smallList, activeList) {
+    const response = await fetch(endpoints.submit, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            "mass": field1.value,
+            "capsuleType": field2.value,
+            "quantity": field3.value,
+            "bottleSize": field4.value,
+            "bottleColor": field5.value,
+            "bottleCapType": field6.value,
+            "bottleCapColor": field7.value,
+            "pillsPerBottle": field8.value,
+            "smallIngredients": smallList,
+            "activeIngredients": activeList
+        })
+    });
+
+    const data = await response.json();
+    alert(data);
+}
+
+function checkField9() {
+    for (let i = 0; i < field9.children.length; i++) {
+        const item = field9.children[i].querySelector('.smallIngredient');
+        if (field9.children[i].querySelector('.small-counter-display').value < 0) {
+            return false;
+        }
+    }
+
+    return true;
 }
