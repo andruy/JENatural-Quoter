@@ -31,10 +31,6 @@ document.onload = getBottleSizes();
 document.onload = getBottleCapTypes();
 document.onload = getBottleAndCapColors();
 document.onload = getActiveIngredients();
-document.onload = getSmallIngredients();
-document.onload = setTimeout(() => {
-    sortList(field11);
-}, 5000);
 
 let bottleSizes;
 let bottleCapTypes;
@@ -56,7 +52,7 @@ document.querySelectorAll(".form-group")[3].addEventListener("change", () => {
     if (field4.value != "") {
         section3.style.display = "none";
     }
-})
+});
 
 for (let i = 4; i < 8; i++) {
     document.querySelectorAll(".form-group")[i].addEventListener("change", () => {
@@ -119,6 +115,67 @@ function resetSectionsBelow() {
     poolValue = parseInt(pool.textContent, 10);
 
     section3.style.display = "none";
+}
+
+/**
+ * New code for active ingredients
+ */
+
+fieldA.addEventListener("change", () => {
+    const selectedOption = fieldA.options[fieldA.selectedIndex];
+    if (fieldA.value != "") {
+        qtyInput.disabled = false;
+        qtyInput.placeholder = `Enter ${selectedOption.getAttribute("data-type") === "activeIngredient" ? "milligrams (mg)" : "micrograms (μg)"}`;
+    } else {
+        qtyInput.disabled = true;
+    }
+});
+
+qtyInput.addEventListener("input", () => {
+    if (qtyInput.value != "" && qtyInput.value > 0) {
+        qtyButton.style.display = "block";
+    } else {
+        qtyButton.style.display = "none";
+    }
+});
+
+qtyButton.addEventListener("click", event => {
+    event.preventDefault();
+    const selectedOption = fieldA.options[fieldA.selectedIndex];
+
+    const listItem = document.createElement("li");
+    listItem.innerHTML = `<label>${qtyInput.value}${selectedOption.getAttribute("data-type") === "activeIngredient" ? " mg" : " μg"}</label><span>${fieldA.value}</span><button onclick="removeBox(this, event)">X</button>`;
+    listItem.classList.add("box");
+    listItem.setAttribute("data-type", selectedOption.getAttribute("data-type"));
+    fieldB.appendChild(listItem);
+
+    const indexToRemove = fieldA.selectedIndex;
+    if (indexToRemove >= 0 && indexToRemove < fieldA.options.length) {
+        fieldA.remove(indexToRemove);
+    }
+
+    resetSelect();
+});
+
+function removeBox(button, event) {
+    event.preventDefault();
+    const optionValue = button.previousElementSibling;
+    const option = document.createElement("option");
+    option.value = optionValue.textContent;
+    option.text = optionValue.textContent;
+    option.setAttribute("data-type", button.parentElement.getAttribute("data-type"));
+    fieldA.appendChild(option);
+    sortOptions(fieldA);
+    resetSelect();
+    button.parentElement.remove();
+}
+
+function resetSelect() {
+    fieldA.value = "";
+    qtyInput.value = "";
+    qtyInput.disabled = true;
+    qtyInput.placeholder = "";
+    qtyButton.style.display = "none";
 }
 
 /**
@@ -310,6 +367,13 @@ function refreshInput(item) {
     }
 }
 
+function sortOptions(select) {
+    const options = select.options;
+    const sortedOptions = Array.from(options).sort((a, b) => a.text.localeCompare(b.text));
+    select.innerHTML = "";
+    sortedOptions.forEach(option => select.appendChild(option));
+}
+
 function sortList(ul) {
     const listItems = Array.from(ul.children);
 
@@ -385,31 +449,29 @@ async function getBottleAndCapColors() {
 }
 
 async function getActiveIngredients() {
-    const response = await fetch(endpoints.activeIngredients);
-    activeIngredients = await response.json();
+    const response1 = await fetch(endpoints.activeIngredients);
+    activeIngredients = await response1.json();
 
     for (let i = 0; i < activeIngredients.length; i++) {
-        const button = document.createElement("button");
-        button.appendChild(document.createTextNode(activeIngredients[i]));
-        const listItem = document.createElement("li");
-        listItem.appendChild(button);
-        button.classList.add("activeIngredient");
-        field11.appendChild(listItem);
+        const option = document.createElement("option");
+        option.value = activeIngredients[i];
+        option.text = activeIngredients[i];
+        option.setAttribute("data-type", "activeIngredient");
+        fieldA.appendChild(option);
     }
-}
 
-async function getSmallIngredients() {
-    const response = await fetch(endpoints.smallIngredients);
-    smallIngredients = await response.json();
+    const response2 = await fetch(endpoints.smallIngredients);
+    smallIngredients = await response2.json();
 
     for (let i = 0; i < smallIngredients.length; i++) {
-        const button = document.createElement("button");
-        button.appendChild(document.createTextNode(smallIngredients[i]));
-        const listItem = document.createElement("li");
-        listItem.appendChild(button);
-        button.classList.add("smallIngredient");
-        field11.appendChild(listItem);
+        const option = document.createElement("option");
+        option.value = smallIngredients[i];
+        option.text = smallIngredients[i];
+        option.setAttribute("data-type", "smallIngredient");
+        fieldA.appendChild(option);
     }
+
+    sortOptions(fieldA);
 }
 
 sendButton.addEventListener('click', event => {
