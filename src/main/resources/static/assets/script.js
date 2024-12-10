@@ -48,6 +48,12 @@ for (let i = 0; i < 4; i++) {
     });
 }
 
+document.querySelectorAll(".form-group")[0].addEventListener("change", () => {
+    if (field1.value != "") {
+        section3.style.display = "none";
+    }
+});
+
 document.querySelectorAll(".form-group")[3].addEventListener("change", () => {
     if (field4.value != "") {
         section3.style.display = "none";
@@ -68,6 +74,7 @@ field1.addEventListener("change", resetSectionsBelow);
 field4.addEventListener("change", resetSectionsBelow);
 
 function resetSectionsBelow() {
+    updateRemainder();
     for (let key in bottleSizes) {
         if (bottleSizes.hasOwnProperty(key)) {
             if (key === field4.value) {
@@ -120,8 +127,15 @@ function resetSectionsBelow() {
 /**
  * New code for active ingredients
  */
+let remainder;
+function updateRemainder() {
+    // TODO: update this
 
-fieldA.addEventListener("change", () => {
+    remainder = parseInt(field1.value);
+    qtyInput.max = remainder;
+}
+
+fieldA.addEventListener("input", () => {
     const selectedOption = fieldA.options[fieldA.selectedIndex];
     if (fieldA.value != "") {
         qtyInput.disabled = false;
@@ -132,26 +146,35 @@ fieldA.addEventListener("change", () => {
 });
 
 qtyInput.addEventListener("input", () => {
-    if (qtyInput.value != "" && qtyInput.value > 0) {
+    if (parseInt(qtyInput.value) > 0 && parseInt(qtyInput.value) <= parseInt(qtyInput.max)) {
         qtyButton.style.display = "block";
     } else {
         qtyButton.style.display = "none";
     }
 });
 
+qtyInput.addEventListener("keydown", event => {
+    if (event.key === "Enter") {
+        event.preventDefault();
+        qtyButton.click();
+    }
+});
+
 qtyButton.addEventListener("click", event => {
     event.preventDefault();
-    const selectedOption = fieldA.options[fieldA.selectedIndex];
+    if (parseInt(qtyInput.value) > 0 && parseInt(qtyInput.value) <= parseInt(qtyInput.max)) {
+        const selectedOption = fieldA.options[fieldA.selectedIndex];
 
-    const listItem = document.createElement("li");
-    listItem.innerHTML = `<label>${qtyInput.value}${selectedOption.getAttribute("data-type") === "activeIngredient" ? " mg" : " μg"}</label><span>${fieldA.value}</span><button onclick="removeBox(this, event)">X</button>`;
-    listItem.classList.add("box");
-    listItem.setAttribute("data-type", selectedOption.getAttribute("data-type"));
-    fieldB.appendChild(listItem);
+        const listItem = document.createElement("li");
+        listItem.innerHTML = `<label>${qtyInput.value}${selectedOption.getAttribute("data-type") === "activeIngredient" ? " mg" : " μg"}</label><span>${fieldA.value}</span><button onclick="removeBox(this, event)">X</button>`;
+        listItem.classList.add("box");
+        listItem.setAttribute("data-type", selectedOption.getAttribute("data-type"));
+        fieldB.appendChild(listItem);
 
-    const indexToRemove = fieldA.selectedIndex;
-    if (indexToRemove >= 0 && indexToRemove < fieldA.options.length) {
-        fieldA.remove(indexToRemove);
+        const indexToRemove = fieldA.selectedIndex;
+        if (indexToRemove >= 0 && indexToRemove < fieldA.options.length) {
+            fieldA.remove(indexToRemove);
+        }
     }
 
     resetSelect();

@@ -73,6 +73,10 @@ select {
     font-size: 14px;
 }
 
+#qtyInput {
+    min-width: 175px;
+}
+
 #sendButton, #qtyButton {
     padding: 10px 20px;
     margin: 0 auto;
@@ -177,6 +181,10 @@ button:hover {
 
     label {
         font-size: 13px;
+    }
+
+    #qtyInput {
+        min-width: 170px;
     }
 }
 
