@@ -71,6 +71,7 @@ for (let i = 4; i < 8; i++) {
 }
 
 field1.addEventListener("change", resetSectionsBelow);
+field3.addEventListener("change", resetSectionsBelow);
 field4.addEventListener("change", resetSectionsBelow);
 
 function resetSectionsBelow() {
