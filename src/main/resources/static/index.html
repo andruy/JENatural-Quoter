@@ -63,8 +63,8 @@
             <section id="section3">
                 <br>
                 <div class="form-group">
-                    <label for="fieldA">Active ingredients</label>
-                    <select name="fieldA" id="fieldA" required>
+                    <label for="field9">Active ingredients</label>
+                    <select name="field9" id="field9" required>
                         <option value="" disabled selected hidden>Select ingredient</option>
                     </select>
                     <div id="qty">
@@ -74,13 +74,14 @@
                 </div>
                 <br>
                 <div class="form-group">
-                    <label for="fieldB">Total composition&nbsp;<span id="pool"></span>&nbsp;mg</label>
-                    <ul id="fieldB"></ul>
+                    <div class="label-display">
+                        <label for="field10">Total composition&nbsp;<span id="pool"></span>&nbsp;mg</label>
+                        <span id="cost-display">Total cost: $<span id="totalCost">0</span></span>
+                    </div>
+                    <ul id="field10"></ul>
                 </div>
-            </section>
-            <section id="section4">
-                <br>
                 <div class="form-group">
+                    <br>
                     <button id="sendButton">Submit</button>
                 </div>
             </section>

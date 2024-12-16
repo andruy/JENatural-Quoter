@@ -52,7 +52,7 @@ li {
     margin-bottom: 15px;
 }
 
-label {
+label, #cost-display {
     display: block;
     margin-bottom: 5px;
     font-size: 15px;
@@ -90,31 +90,13 @@ select {
     height: 40px;
     white-space: nowrap;
     overflow: hidden;
-    /* text-overflow: ellipsis; */
 }
 
 button:hover {
     background-color: #0056b3;
 }
 
-.counter-container {
-    display: flex;
-    flex: 4;
-    padding-left: 10px;
-}
-
-.counter-display, .small-counter-display {
-    text-align: center;
-}
-
-.counter-button {
-    width: 40px;
-    display: flex;
-    justify-content: center;
-}
-
 #sendButton {
-    display: none;
     margin: 0.45em auto;
     margin-bottom: 15px;
     font-size: 1rem;
@@ -133,7 +115,6 @@ button:hover {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-radius: 2px solid #3b8eee75;
     background-color: rgba(0, 0, 0, .04);
     color: #676767;
     font-size: medium;
@@ -158,13 +139,12 @@ button:hover {
     white-space: nowrap;
 }
 
-.smallSection {
+.label-display {
     display: flex;
-    justify-content: center;
-    font-size: 1rem;
+    justify-content: space-between;
 }
 
-#section2, #section3, #section4 {
+#section2, #section3 {
     display: none;
 }
 
@@ -175,11 +155,7 @@ button:hover {
 }
 
 @media screen and (max-width: 600px) {
-    .counter-container {
-        flex: 5;
-    }
-
-    label {
+    label #cost-display {
         font-size: 13px;
     }
 

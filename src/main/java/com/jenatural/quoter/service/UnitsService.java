@@ -8,7 +8,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
-import java.util.stream.Collectors;
 
 import org.json.JSONObject;
 import org.springframework.stereotype.Service;
@@ -105,7 +104,7 @@ public class UnitsService {
         return sb.toString();
     }
 
-    public List<List<String>> submitForm(Form form) {
+    public double submitForm(Form form) {
         List<ActiveIngredient> activeIngredients = new ArrayList<>();
         List<SmallIngredient> smallIngredients = new ArrayList<>();
         JSONObject mainObject = new JSONObject(parseJsonFile(FILE));
@@ -124,19 +123,24 @@ public class UnitsService {
         System.out.println(activeIngredients);
 
         for (String key : form.smallIngredients().keySet()) {
-            JSONObject ingredient = smallList.getJSONObject(key);
-
-            double totalMass = form.smallIngredients().get(key) / 100.0;
-            totalMass *= ingredient.getDouble("DV");
-            totalMass *= quantity;
+            double totalMass = form.smallIngredients().get(key) * quantity;
             totalMass /= 1000000.0;
 
-            smallIngredients.add(new SmallIngredient(key, totalMass, ingredient.getBigDecimal("COST").multiply(new BigDecimal(totalMass))));
+            smallIngredients.add(new SmallIngredient(key, totalMass, smallList.getBigDecimal(key).multiply(new BigDecimal(totalMass))));
 
-            System.out.println(key + ": " + ingredient.getBigDecimal("COST"));
+            System.out.println(key + ": " + smallList.getBigDecimal(key));
         }
         System.out.println(smallIngredients);
 
-        return List.of(activeIngredients.stream().map(ActiveIngredient::toString).collect(Collectors.toList()), smallIngredients.stream().map(SmallIngredient::toString).collect(Collectors.toList()));
+        // return List.of(activeIngredients.stream().map(ActiveIngredient::toString).collect(Collectors.toList()), smallIngredients.stream().map(SmallIngredient::toString).collect(Collectors.toList()));
+        BigDecimal totalCost = new BigDecimal(0);
+        for (ActiveIngredient activeIngredient : activeIngredients) {
+            totalCost = totalCost.add(activeIngredient.totalCost());
+        }
+        for (SmallIngredient smallIngredient : smallIngredients) {
+            totalCost = totalCost.add(smallIngredient.totalCost());
+        }
+        System.out.println("Total cost: " + totalCost);
+        return totalCost.doubleValue();
     }
 }

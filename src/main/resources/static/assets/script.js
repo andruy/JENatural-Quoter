@@ -113,13 +113,10 @@ function resetSectionsBelow() {
         }
     }
 
-    // Move all items down from field10 to field11
-    for (let i = 0; i < field10.children.length; i++) {
-        const item = field10.children[i].querySelector('.activeIngredient');
-        item.click();
+    const boxes = field10.querySelectorAll('.xClose');
+    for (let i = 0; i < boxes.length; i++) {
+        boxes[i].click();
     }
-    pool.textContent = field1.value;
-    poolValue = parseInt(pool.textContent, 10);
 
     section3.style.display = "none";
 }
@@ -127,17 +124,54 @@ function resetSectionsBelow() {
 /**
  * New code for active ingredients
  */
-let remainder;
-function updateRemainder() {
-    // TODO: update this
+async function updateRemainder() {
+    const mgMass = [];
+    const mcgMass = [];
+    let totalMass = 0;
+    let totalMicrograms = 0;
+    let smallList = {};
+    let activeList = {};
+    const boxes = field10.querySelectorAll('.box');
+    for (let i = 0; i < boxes.length; i++) {
+        if (boxes[i].querySelector('.counter').innerText.slice(-2) === "mg") {
+            mgMass.push(boxes[i].querySelector('.counter').innerHTML.slice(0, -3));
+            activeList[boxes[i].querySelector('.identifier').innerText] = boxes[i].querySelector('.counter').innerHTML.slice(0, -3);
+        } else {
+            mcgMass.push(boxes[i].querySelector('.counter').innerHTML.slice(0, -3));
+            smallList[boxes[i].querySelector('.identifier').innerText] = boxes[i].querySelector('.counter').innerHTML.slice(0, -3);
+        }
+    }
 
-    remainder = parseInt(field1.value);
-    qtyInput.max = remainder;
+    for (let i = 0; i < mgMass.length; i++) {
+        totalMass += parseInt(mgMass[i]);
+    }
+
+    for (let i = 0; i < mcgMass.length; i++) {
+        totalMicrograms += parseInt(mcgMass[i]);
+    }
+
+    // if (totalMicrograms > 1000) {
+    //     totalMass = totalMass + (totalMicrograms / 1000);
+    // }
+    // totalMicrograms = totalMicrograms / 1000;
+    // totalMass = totalMass + totalMicrograms;
+
+    pool.innerText = totalMass;
+    const remainder = parseInt(field1.value);
+    qtyInput.max = remainder - totalMass > 0 ? remainder - totalMass : 0;
+
+    document.querySelectorAll('.form-group')[9].style.display = boxes.length > 0 ? "block" : "none";
+    document.querySelectorAll('.form-group')[10].style.display = boxes.length > 0 ? "block" : "none";
+
+    const finalCost = new Promise(resolve => {
+        resolve(sendQuote(smallList, activeList));
+    });
+    totalCost.innerHTML = await finalCost;
 }
 
-fieldA.addEventListener("input", () => {
-    const selectedOption = fieldA.options[fieldA.selectedIndex];
-    if (fieldA.value != "") {
+field9.addEventListener("input", () => {
+    const selectedOption = field9.options[field9.selectedIndex];
+    if (field9.value != "") {
         qtyInput.disabled = false;
         qtyInput.placeholder = `Enter ${selectedOption.getAttribute("data-type") === "activeIngredient" ? "milligrams (mg)" : "micrograms (μg)"}`;
     } else {
@@ -146,10 +180,19 @@ fieldA.addEventListener("input", () => {
 });
 
 qtyInput.addEventListener("input", () => {
-    if (parseInt(qtyInput.value) > 0 && parseInt(qtyInput.value) <= parseInt(qtyInput.max)) {
-        qtyButton.style.display = "block";
+    const selectedOption = field9.options[field9.selectedIndex];
+    if (selectedOption.getAttribute("data-type") === "activeIngredient") {
+        if (parseInt(qtyInput.value) > 0 && parseInt(qtyInput.value) <= parseInt(qtyInput.max)) {
+            qtyButton.style.display = "block";
+        } else {
+            qtyButton.style.display = "none";
+        }
     } else {
-        qtyButton.style.display = "none";
+        if (parseInt(qtyInput.value) > 0) {
+            qtyButton.style.display = "block";
+        } else {
+            qtyButton.style.display = "none";
+        }
     }
 });
 
@@ -162,21 +205,37 @@ qtyInput.addEventListener("keydown", event => {
 
 qtyButton.addEventListener("click", event => {
     event.preventDefault();
-    if (parseInt(qtyInput.value) > 0 && parseInt(qtyInput.value) <= parseInt(qtyInput.max)) {
-        const selectedOption = fieldA.options[fieldA.selectedIndex];
-
-        const listItem = document.createElement("li");
-        listItem.innerHTML = `<label>${qtyInput.value}${selectedOption.getAttribute("data-type") === "activeIngredient" ? " mg" : " μg"}</label><span>${fieldA.value}</span><button onclick="removeBox(this, event)">X</button>`;
-        listItem.classList.add("box");
-        listItem.setAttribute("data-type", selectedOption.getAttribute("data-type"));
-        fieldB.appendChild(listItem);
-
-        const indexToRemove = fieldA.selectedIndex;
-        if (indexToRemove >= 0 && indexToRemove < fieldA.options.length) {
-            fieldA.remove(indexToRemove);
+    const selectedOption = field9.options[field9.selectedIndex];
+    if (selectedOption.getAttribute("data-type") === "activeIngredient") {
+        if (parseInt(qtyInput.value) > 0 && parseInt(qtyInput.value) <= parseInt(qtyInput.max)) {
+    
+            const listItem = document.createElement("li");
+            listItem.innerHTML = `<label class="counter">${qtyInput.value}${selectedOption.getAttribute("data-type") === "activeIngredient" ? " mg" : " μg"}</label><span class="identifier">${field9.value}</span><button class="xClose" onclick="removeBox(this, event)">X</button>`;
+            listItem.classList.add("box");
+            listItem.setAttribute("data-type", selectedOption.getAttribute("data-type"));
+            field10.appendChild(listItem);
+    
+            const indexToRemove = field9.selectedIndex;
+            if (indexToRemove >= 0 && indexToRemove < field9.options.length) {
+                field9.remove(indexToRemove);
+            }
+        }
+    } else {
+        if (parseInt(qtyInput.value) > 0) {
+            const listItem = document.createElement("li");
+            listItem.innerHTML = `<label class="counter">${qtyInput.value}${selectedOption.getAttribute("data-type") === "activeIngredient" ? " mg" : " μg"}</label><span class="identifier">${field9.value}</span><button class="xClose" onclick="removeBox(this, event)">X</button>`;
+            listItem.classList.add("box");
+            listItem.setAttribute("data-type", selectedOption.getAttribute("data-type"));
+            field10.appendChild(listItem);
+    
+            const indexToRemove = field9.selectedIndex;
+            if (indexToRemove >= 0 && indexToRemove < field9.options.length) {
+                field9.remove(indexToRemove);
+            }
         }
     }
 
+    updateRemainder();
     resetSelect();
 });
 
@@ -187,207 +246,19 @@ function removeBox(button, event) {
     option.value = optionValue.textContent;
     option.text = optionValue.textContent;
     option.setAttribute("data-type", button.parentElement.getAttribute("data-type"));
-    fieldA.appendChild(option);
-    sortOptions(fieldA);
-    resetSelect();
+    field9.appendChild(option);
+    sortOptions(field9);
     button.parentElement.remove();
+    resetSelect();
+    updateRemainder();
 }
 
 function resetSelect() {
-    fieldA.value = "";
+    field9.value = "";
     qtyInput.value = "";
     qtyInput.disabled = true;
     qtyInput.placeholder = "";
     qtyButton.style.display = "none";
-}
-
-/**
- * Active ingredients
- */
-const label9 = document.querySelector('label[for="field9"]');
-label9.style.display = 'none';
-
-const label10 = document.querySelector('label[for="field10"]');
-label10.style.display = 'none';
-
-let poolValue = 0;
-
-const observer = new MutationObserver(() => {
-    if (field9.querySelectorAll('li').length > 0) {
-        label9.style.display = 'block';
-    } else {
-        label9.style.display = 'none';
-    }
-
-    if (field10.querySelectorAll('li').length > 0) {
-        label10.style.display = 'block';
-    } else {
-        label10.style.display = 'none';
-    }
-});
-
-observer.observe(field9, { childList: true });
-observer.observe(field10, { childList: true });
-
-// Function to update the counter and pool display
-function updatePoolDisplay() {
-    pool.textContent = poolValue;
-
-    if (poolValue == 0) {
-        const list = document.querySelectorAll('.counter-display');
-        
-        list.forEach(item => {
-            if (item.value <= 0) {
-                item.parentElement.parentElement.firstChild.click();
-            }
-        });
-
-        sendButton.style.display = 'block';
-    } else {
-        sendButton.style.display = 'none';
-    }
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-    // Function to handle item selection
-    function selectItem(event) {
-        const item = event.target;
-
-        if (item.classList.contains('activeIngredient') || item.classList.contains('smallIngredient')) {
-            const parent = item.parentElement;
-            if (parent.parentElement.id === 'field10') {
-                const select = item.nextElementSibling.querySelector('select');
-                if (select.value > 0) {
-                    poolValue += parseInt(select.value);
-                    updatePoolDisplay();
-                }
-            }
-
-            if (parent.parentElement.id === 'field11' && poolValue <= 0 && item.classList.contains('activeIngredient')) {
-                event.preventDefault();
-                const temp = item.innerText;
-                item.innerText = "No more sources available";
-                setTimeout(() => {
-                    item.innerText = temp;
-                    item.blur();
-                }, 1500);
-            } else {
-                parent.innerHTML = `<div style="width: 40px; height: 40px; margin: auto"><svg width="100%" height="100%" viewBox="0 0 100 100"><circle class="circle" cx="50" cy="50" r="30" fill="none" stroke="#FFFFFF" stroke-width="5"/></svg></div>`;
-                parent.style.backgroundColor = '#007BFF';
-                setTimeout(() => {
-                    const listItem = document.createElement("li");
-                    listItem.appendChild(item);
-
-                    if (parent.parentElement.id === 'field9' || parent.parentElement.id === 'field10') {
-                        parent.remove();
-                        field11.appendChild(listItem);
-                        sortList(field11);
-                        return;
-                    }
-
-                    if (parent.parentElement.id === 'field11' && item.classList.contains('activeIngredient')) {
-                        const counterContainer = document.createElement('div');
-                        counterContainer.classList.add('counter-container');
-
-                        const counterDisplay = document.createElement('select');
-                        counterDisplay.classList.add('counter-display');
-
-                        counterContainer.appendChild(counterDisplay);
-                        listItem.appendChild(counterContainer);
-
-                        counterDisplay.innerHTML = `<option value="-1" disabled selected hidden>Add ingredient</option>`;
-
-                        counterDisplay.addEventListener('focus', () => {
-                            beforeChange = counterDisplay.value;
-                            refreshInput(counterDisplay);
-                        });
-
-                        counterDisplay.addEventListener('input', () => {
-                            if (counterDisplay.value != beforeChange) {
-                                if (beforeChange == -1) {
-                                    beforeChange = 0;
-                                }
-
-                                poolValue += parseInt(beforeChange);
-                                poolValue -= parseInt(counterDisplay.value);
-                                refreshInput(counterDisplay);
-                                beforeChange = counterDisplay.value;
-                                updatePoolDisplay();
-
-                                if (counterDisplay.value == 0) {
-                                    item.click();
-                                }
-                            }
-                        });
-
-                        parent.remove();
-                        field10.appendChild(listItem);
-                        sortList(field10);
-                        return;
-                    }
-
-                    if (parent.parentElement.id === 'field11' && item.classList.contains('smallIngredient')) {
-                        const counterContainer = document.createElement('div');
-                        counterContainer.classList.add('counter-container');
-
-                        const counterDisplay = document.createElement('select');
-                        counterDisplay.classList.add('small-counter-display');
-
-                        counterContainer.appendChild(counterDisplay);
-                        listItem.appendChild(counterContainer);
-
-                        counterDisplay.innerHTML = `<option value="-1" disabled selected hidden>Add ingredient</option>`;
-                        for (let i = 25; i <= 100; i += 25) {
-                            const option = document.createElement("option");
-                            option.value = i;
-                            option.text = i + "%";
-                            counterDisplay.appendChild(option);
-                        }
-
-                        counterDisplay.addEventListener('input', () => {
-                            if (counterDisplay.value == 0) {
-                                item.click();
-                            }
-                        });
-
-                        parent.remove();
-                        field9.appendChild(listItem);
-                        sortList(field9);
-                        return;
-                    }
-                }, 500);
-            }
-        }
-    }
-
-    field9.addEventListener('click', selectItem);
-    field10.addEventListener('click', selectItem);
-    field11.addEventListener('click', selectItem);
-});
-
-let beforeChange;
-
-function refreshInput(item) {
-    let preserve = item.value;
-
-    item.innerHTML = `<option value="-1" disabled selected hidden>Add ingredient</option>`;
-
-    const goal = poolValue + parseInt(preserve == -1 ? 0 : preserve);
-
-    for (let i = 25; i <= goal; i += 25) {
-        const option = document.createElement("option");
-        option.value = i;
-        option.text = i + " mg";
-        item.appendChild(option);
-    }
-
-    const options = item.options;
-    for (let i = 0; i < options.length; i++) {
-        if (options[i].value == preserve) {
-            options[i].selected = true;
-            break;
-        }
-    }
 }
 
 function sortOptions(select) {
@@ -395,20 +266,6 @@ function sortOptions(select) {
     const sortedOptions = Array.from(options).sort((a, b) => a.text.localeCompare(b.text));
     select.innerHTML = "";
     sortedOptions.forEach(option => select.appendChild(option));
-}
-
-function sortList(ul) {
-    const listItems = Array.from(ul.children);
-
-    // Sort the list items based on the text content of their first child
-    listItems.sort((a, b) => {
-        const textA = a.firstElementChild.textContent.toLowerCase();
-        const textB = b.firstElementChild.textContent.toLowerCase();
-        return textA.localeCompare(textB);
-    });
-
-    // Append the sorted <li> elements back to the <ul>
-    listItems.forEach(li => ul.appendChild(li));
 }
 
 function populateQuantity() {
@@ -480,7 +337,7 @@ async function getActiveIngredients() {
         option.value = activeIngredients[i];
         option.text = activeIngredients[i];
         option.setAttribute("data-type", "activeIngredient");
-        fieldA.appendChild(option);
+        field9.appendChild(option);
     }
 
     const response2 = await fetch(endpoints.smallIngredients);
@@ -491,30 +348,20 @@ async function getActiveIngredients() {
         option.value = smallIngredients[i];
         option.text = smallIngredients[i];
         option.setAttribute("data-type", "smallIngredient");
-        fieldA.appendChild(option);
+        field9.appendChild(option);
     }
 
-    sortOptions(fieldA);
+    sortOptions(field9);
 }
 
 sendButton.addEventListener('click', event => {
     event.preventDefault();
     // event.target.disabled = true;
-    if (checkField9()) {
-        let smallList = {};
-        for (let i = 0; i < field9.children.length; i++) {
-            const item = field9.children[i].querySelector('.smallIngredient');
-            smallList[item.innerText] = field9.children[i].querySelector('.small-counter-display').value;
-        }
-    
-        let activeList = {};
-        for (let i = 0; i < field10.children.length; i++) {
-            const item = field10.children[i].querySelector('.activeIngredient');
-            activeList[item.innerText] = field10.children[i].querySelector('.counter-display').value;
-        }
-    
-        sendQuote(smallList, activeList);
-    }
+    let smallList = {};
+    let activeList = {};
+
+    sendQuote(smallList, activeList);
+    alert("You will receive a quote via email.");
 });
 
 async function sendQuote(smallList, activeList) {
@@ -538,16 +385,6 @@ async function sendQuote(smallList, activeList) {
     });
 
     const data = await response.json();
-    alert(data);
-}
-
-function checkField9() {
-    for (let i = 0; i < field9.children.length; i++) {
-        const item = field9.children[i].querySelector('.smallIngredient');
-        if (field9.children[i].querySelector('.small-counter-display').value < 0) {
-            return false;
-        }
-    }
-
-    return true;
+    console.log(data);
+    return data;
 }
