@@ -263,9 +263,9 @@ function resetSelect() {
 }
 
 function sortOptions(select) {
-    const options = select.options;
-    const sortedOptions = Array.from(options).sort((a, b) => a.text.localeCompare(b.text));
-    select.innerHTML = "";
+    select.removeChild(select.firstElementChild);
+    const sortedOptions = Array.from(select.options).sort((a, b) => a.text.localeCompare(b.text));
+    select.innerHTML = `<option value="" disabled selected hidden>Select ingredient</option>`;
     sortedOptions.forEach(option => select.appendChild(option));
 }
 
@@ -353,6 +353,7 @@ async function getActiveIngredients() {
     }
 
     sortOptions(field9);
+    field9.selectedIndex = 0;
 }
 
 sendButton.addEventListener('click', event => {
