@@ -63,7 +63,7 @@ public class UnitsController {
     }
 
     @PostMapping("/submit")
-    public ResponseEntity<List<List<String>>> submitForm(@RequestBody Form form) {
+    public ResponseEntity<Double> submitForm(@RequestBody Form form) {
         return ResponseEntity.ok(unitsService.submitForm(form));
     }
 }

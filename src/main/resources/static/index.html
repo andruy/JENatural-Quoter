@@ -62,26 +62,27 @@
             </section>
             <section id="section3">
                 <br>
-                <div>
-                    <button id="sendButton">Submit</button>
-                </div>
                 <div class="form-group">
-                    <label for="field9">Smaller components (100% DV)</label>
-                    <ul id="field9"></ul>
+                    <label for="field9">Active ingredients</label>
+                    <select name="field9" id="field9" required>
+                        <option value="" disabled selected hidden>Select ingredient</option>
+                    </select>
+                    <div id="qty">
+                        <input type="number" inputmode="numeric" min="1" pattern="\d*" name="qtyInput" id="qtyInput" disabled />
+                        <button id="qtyButton">↵</button>
+                    </div>
                 </div>
+                <br>
                 <div class="form-group">
-                    <label for="field10">Composition&nbsp;<span id="pool"></span>&nbsp;mg</label>
+                    <div class="label-display">
+                        <label for="field10">Total composition&nbsp;<span id="pool"></span>&nbsp;mg</label>
+                        <span id="cost-display">Total cost: $<span id="totalCost">0</span></span>
+                    </div>
                     <ul id="field10"></ul>
                 </div>
                 <div class="form-group">
-                    <label for="field11">Click to add active ingredients</label>
-                    <ul id="field11"></ul>
-                </div>
-            </section>
-            <section id="section4">
-                <br>
-                <div class="form-group">
-                    <button type="submit">Submit</button>
+                    <br>
+                    <button id="sendButton">Submit</button>
                 </div>
             </section>
         </form>

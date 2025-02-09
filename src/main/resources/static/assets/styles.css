@@ -52,7 +52,7 @@ li {
     margin-bottom: 15px;
 }
 
-label {
+label, #cost-display {
     display: block;
     margin-bottom: 5px;
     font-size: 15px;
@@ -73,7 +73,11 @@ select {
     font-size: 14px;
 }
 
-li button, #sendButton {
+#qtyInput {
+    min-width: 175px;
+}
+
+#sendButton, #qtyButton {
     padding: 10px 20px;
     margin: 0 auto;
     display: block;
@@ -86,47 +90,61 @@ li button, #sendButton {
     height: 40px;
     white-space: nowrap;
     overflow: hidden;
-    text-overflow: ellipsis;
 }
 
 button:hover {
     background-color: #0056b3;
 }
 
-.activeIngredient, .smallIngredient {
-    flex: 6;
-}
-
-.counter-container {
-    display: flex;
-    flex: 4;
-    padding-left: 10px;
-}
-
-.counter-display, .small-counter-display {
-    text-align: center;
-}
-
-.counter-button {
-    width: 40px;
-    display: flex;
-    justify-content: center;
-}
-
 #sendButton {
-    display: none;
     margin: 0.45em auto;
     margin-bottom: 15px;
     font-size: 1rem;
 }
 
-.smallSection {
-    display: flex;
-    justify-content: center;
-    font-size: 1rem;
+#qty {
+    display: inline-flex;
+    margin-top: 2px;
 }
 
-#section2, #section3, #section4 {
+#qtyButton {
+    display: none;
+}
+
+.box {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: rgba(0, 0, 0, .04);
+    color: #676767;
+    font-size: medium;
+}
+
+.box button {
+    border: none;
+    border-radius: 4px;
+    background-color: #3b8eee;
+    color: white;
+    cursor: pointer;
+}
+
+.box span {
+    padding: 0 10px;
+    white-space: nowrap;
+    overflow: auto;
+}
+
+.box label {
+    margin-bottom: 0;
+    white-space: nowrap;
+}
+
+.label-display {
+    display: flex;
+    justify-content: space-between;
+}
+
+#section2, #section3 {
     display: none;
 }
 
@@ -137,16 +155,12 @@ button:hover {
 }
 
 @media screen and (max-width: 600px) {
-    .activeIngredient, .smallIngredient {
-        flex: 5;
-    }
-
-    .counter-container {
-        flex: 5;
-    }
-
-    label {
+    label #cost-display {
         font-size: 13px;
+    }
+
+    #qtyInput {
+        min-width: 170px;
     }
 }
 
