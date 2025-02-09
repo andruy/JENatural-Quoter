@@ -106,13 +106,15 @@ public class UnitsService {
         return sb.toString();
     }
 
-    public double submitForm(Form form) {
+    public Map<String, Double> submitForm(Form form) {
+        Map<String, Double> result = new HashMap<>();
         List<ActiveIngredient> activeIngredients = new ArrayList<>();
         List<SmallIngredient> smallIngredients = new ArrayList<>();
         JSONObject mainObject = new JSONObject(parseJsonFile(FILE));
         JSONObject activeList = mainObject.getJSONObject("Ingredients");
         JSONObject smallList = mainObject.getJSONObject("SmallIngredients");
         int quantity = form.quantity();
+        double bottleQuantity = Math.ceil((double) quantity / form.pillsPerBottle());
 
         for (String key : form.activeIngredients().keySet()) {
             int totalMass = form.activeIngredients().get(key) * quantity;
@@ -142,7 +144,12 @@ public class UnitsService {
         for (SmallIngredient smallIngredient : smallIngredients) {
             totalCost = totalCost.add(smallIngredient.totalCost());
         }
-        System.out.println("Total cost: " + totalCost);
-        return totalCost.doubleValue();
+
+        result.put("total", totalCost.doubleValue());
+        result.put("bottleQuantity", bottleQuantity);
+        result.put("eachBottleCost", totalCost.doubleValue() / bottleQuantity);
+        System.out.println(result);
+
+        return result;
     }
 }

@@ -52,7 +52,7 @@ li {
     margin-bottom: 15px;
 }
 
-label, #cost-display {
+label, .cost-display {
     display: block;
     margin-bottom: 5px;
     font-size: 15px;
@@ -154,8 +154,20 @@ button:hover {
     animation: draw .5s linear forwards;
 }
 
+.identifier {
+    padding: 0 !important;
+}
+
+.counter {
+    margin-right: 10px;
+}
+
+.xClose {
+    margin-left: 10px;
+}
+
 @media screen and (max-width: 600px) {
-    label #cost-display {
+    label .cost-display {
         font-size: 13px;
     }
 

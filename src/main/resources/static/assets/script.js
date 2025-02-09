@@ -167,8 +167,15 @@ async function updateRemainder() {
     const finalCost = new Promise(resolve => {
         resolve(sendQuote(smallList, activeList));
     });
-    totalCost.innerHTML = await finalCost;
+    const response = await finalCost;
+    totalCost.innerHTML = response.total;
+    howManyBottles.innerHTML = response.bottleQuantity;
+    eachBottleCost.innerHTML = response.eachBottleCost.toFixed(2);
 }
+
+field8.addEventListener("change", () => {
+    updateRemainder();
+});
 
 field9.addEventListener("input", () => {
     const selectedOption = field9.options[field9.selectedIndex];

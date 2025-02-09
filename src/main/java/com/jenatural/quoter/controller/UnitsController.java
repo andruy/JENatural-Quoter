@@ -1,6 +1,7 @@
 package com.jenatural.quoter.controller;
 
 import java.util.List;
+import java.util.Map;
 import java.util.TreeMap;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,7 +64,7 @@ public class UnitsController {
     }
 
     @PostMapping("/submit")
-    public ResponseEntity<Double> submitForm(@RequestBody Form form) {
+    public ResponseEntity<Map<String, Double>> submitForm(@RequestBody Form form) {
         return ResponseEntity.ok(unitsService.submitForm(form));
     }
 }
