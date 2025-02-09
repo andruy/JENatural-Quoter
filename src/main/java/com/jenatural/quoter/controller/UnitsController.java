@@ -1,7 +1,7 @@
 package com.jenatural.quoter.controller;
 
 import java.util.List;
-import java.util.Map;
+import java.util.TreeMap;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -33,7 +33,7 @@ public class UnitsController {
     }
 
     @GetMapping("/bottleSizes")
-    public ResponseEntity<Map<Bottle, List<Integer>>> getBottleSizes() {
+    public ResponseEntity<TreeMap<Bottle, List<Integer>>> getBottleSizes() {
         return ResponseEntity.ok(unitsService.getBottleSizes());
     }
 

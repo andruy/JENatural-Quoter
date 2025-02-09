@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.TreeMap;
 
 import org.json.JSONObject;
 import org.springframework.stereotype.Service;
@@ -42,12 +43,13 @@ public class UnitsService {
         return options;
     }
 
-    public Map<Bottle, List<Integer>> getBottleSizes() {
+    public TreeMap<Bottle, List<Integer>> getBottleSizes() {
         Map<Bottle, List<Integer>> sizes = new HashMap<>();
         for (BottleSize b : BottleSize.values()) {
             sizes.put(b.getBottle(), b.getCapacity());
         }
-        return sizes;
+
+        return new TreeMap<>(sizes);
     }
 
     public int getNumberOfBottles(int capsuleQuantity, int capsulesPerBottle) {
