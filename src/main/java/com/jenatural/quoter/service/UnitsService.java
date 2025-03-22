@@ -136,7 +136,6 @@ public class UnitsService {
         }
         System.out.println(smallIngredients);
 
-        // return List.of(activeIngredients.stream().map(ActiveIngredient::toString).collect(Collectors.toList()), smallIngredients.stream().map(SmallIngredient::toString).collect(Collectors.toList()));
         BigDecimal totalCost = new BigDecimal(0);
         for (ActiveIngredient activeIngredient : activeIngredients) {
             totalCost = totalCost.add(activeIngredient.totalCost());
@@ -145,7 +144,80 @@ public class UnitsService {
             totalCost = totalCost.add(smallIngredient.totalCost());
         }
 
-        result.put("total", totalCost.doubleValue());
+        /**
+         * Addendum
+         */
+        if (form.mass() == 500) {
+            totalCost = totalCost.add(new BigDecimal(1 * bottleQuantity));
+        }
+
+        if (form.mass() == 1000) {
+            totalCost = totalCost.add(new BigDecimal(2 * bottleQuantity));
+        }
+
+        if (form.capsuleType().equals("GELATINE")) {
+            totalCost = totalCost.add(new BigDecimal(0.5 * bottleQuantity));
+        }
+
+        if (form.capsuleType().equals("VEGGIE")) {
+            totalCost = totalCost.add(new BigDecimal(0.75 * bottleQuantity));
+        }
+
+        double quantityStartingPoint = 1.55;
+        if (form.quantity() == 30000) {
+            totalCost = totalCost.add(new BigDecimal(quantityStartingPoint * bottleQuantity));
+        }
+
+        for (int i = 40000; i <= 100000; i += 10000) {
+            quantityStartingPoint = quantityStartingPoint - (3.0 / 100);
+            if (form.quantity() == i) {
+                totalCost = totalCost.add(new BigDecimal(quantityStartingPoint * bottleQuantity));
+            }
+        }
+
+        for (int i = 110000; i <= 600000; i += 10000) {
+            quantityStartingPoint = quantityStartingPoint - (2.0 / 100);
+            if (form.quantity() == i) {
+                totalCost = totalCost.add(new BigDecimal(quantityStartingPoint * bottleQuantity));
+            }
+        }
+
+        for (int i = 610000; i <= 990000; i += 10000) {
+            quantityStartingPoint = quantityStartingPoint - (1.0 / 100);
+            if (form.quantity() == i) {
+                totalCost = totalCost.add(new BigDecimal(quantityStartingPoint * bottleQuantity));
+            }
+        }
+
+        if (form.bottleSize().contains("150cc")) {
+            totalCost = totalCost.add(new BigDecimal(.5 * bottleQuantity));
+        }
+
+        if (form.bottleSize().contains("250cc")) {
+            totalCost = totalCost.add(new BigDecimal(.65 * bottleQuantity));
+        }
+
+        if (form.bottleCapType().equals("REGULAR")) {
+            totalCost = totalCost.add(new BigDecimal(.15 * bottleQuantity));
+        }
+
+        if (form.bottleCapType().equals("CRC")) {
+            totalCost = totalCost.add(new BigDecimal(.2 * bottleQuantity));
+        }
+
+        if (form.pillsPerBottle() == 30) {
+            totalCost = totalCost.add(new BigDecimal(.35 * bottleQuantity));
+        }
+
+        if (form.pillsPerBottle() == 60) {
+            totalCost = totalCost.add(new BigDecimal(.45 * bottleQuantity));
+        }
+
+        if (form.pillsPerBottle() == 90) {
+            totalCost = totalCost.add(new BigDecimal(.55 * bottleQuantity));
+        }
+
+        result.put("total", totalCost.setScale(2, java.math.RoundingMode.UP).doubleValue());
         result.put("bottleQuantity", bottleQuantity);
         result.put("eachBottleCost", totalCost.doubleValue() / bottleQuantity);
         System.out.println(result);

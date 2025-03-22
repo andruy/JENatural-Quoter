@@ -13,7 +13,6 @@ body {
     justify-content: center;
     align-items: center;
     background-color: #3b8eee;
-    color: #ddd;
 }
 
 .container {
@@ -74,7 +73,7 @@ select {
 }
 
 #qtyInput {
-    min-width: 175px;
+    min-width: 200px;
 }
 
 #sendButton, #qtyButton {
@@ -141,7 +140,19 @@ button:hover {
 
 .label-display {
     display: flex;
+    align-items: center;
     justify-content: space-between;
+}
+
+.custom-font {
+    margin-top: 0;
+    margin-bottom: 5px;
+    font-size: 15px;
+    font-weight: 500;
+}
+
+.custom-blue {
+    color: #3b8eee;
 }
 
 #section2, #section3 {
@@ -169,10 +180,6 @@ button:hover {
 @media screen and (max-width: 600px) {
     label .cost-display {
         font-size: 13px;
-    }
-
-    #qtyInput {
-        min-width: 180px;
     }
 }
 
