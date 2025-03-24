@@ -38,11 +38,6 @@ public class UnitsController {
         return ResponseEntity.ok(unitsService.getBottleSizes());
     }
 
-    @GetMapping("numberOfBottles")
-    public ResponseEntity<Integer> getNumberOfBottles(@RequestParam Integer capsuleQuantity, @RequestParam Integer capsulesPerBottle) {
-        return ResponseEntity.ok(unitsService.getNumberOfBottles(capsuleQuantity, capsulesPerBottle));
-    }
-
     @GetMapping("/bottleCapTypes")
     public ResponseEntity<List<String>> getBottleCapTypes() { // TODO
         return ResponseEntity.ok(unitsService.getBottleCapTypes());
@@ -66,5 +61,10 @@ public class UnitsController {
     @PostMapping("/submit")
     public ResponseEntity<Map<String, Double>> submitForm(@RequestBody Form form) {
         return ResponseEntity.ok(unitsService.submitForm(form));
+    }
+
+    @PostMapping("/sendQuote")
+    public ResponseEntity<String> sendQuote(@RequestParam String recipient, @RequestBody Form form) {
+        return ResponseEntity.ok(unitsService.sendQuote(recipient, form));
     }
 }

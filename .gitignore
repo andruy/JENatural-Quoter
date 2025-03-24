@@ -1,12 +1,11 @@
 list.json
 HELP.md
 target/
+logs/
+application.properties
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
-
-# Ignore application-dev.properties
-**/application-dev.properties
 
 ### STS ###
 .apt_generated

@@ -1,5 +1,6 @@
 package com.jenatural.quoter.service;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.math.BigDecimal;
@@ -10,7 +11,14 @@ import java.util.Map;
 import java.util.Scanner;
 import java.util.TreeMap;
 
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.jenatural.quoter.model.ActiveIngredient;
@@ -22,10 +30,14 @@ import com.jenatural.quoter.model.CapsuleType;
 import com.jenatural.quoter.model.Form;
 import com.jenatural.quoter.model.SmallIngredient;
 import com.jenatural.quoter.model.Weight;
+import com.jenatural.quoter.util.Email;
 
 @Service
 public class UnitsService {
+    private Logger logger = LoggerFactory.getLogger(UnitsService.class);
     private final String FILE = "list.json";
+    @Autowired
+    private Email email;
 
     public List<Integer> getWeightUnits() {
         List<Integer> weightList = new ArrayList<>();
@@ -50,10 +62,6 @@ public class UnitsService {
         }
 
         return new TreeMap<>(sizes);
-    }
-
-    public int getNumberOfBottles(int capsuleQuantity, int capsulesPerBottle) {
-        return capsuleQuantity / capsulesPerBottle;
     }
 
     public List<String> getBottleCapTypes() {
@@ -121,20 +129,14 @@ public class UnitsService {
             totalMass /= 1000;
 
             activeIngredients.add(new ActiveIngredient(key, totalMass, activeList.getBigDecimal(key).multiply(new BigDecimal(totalMass))));
-
-            System.out.println(key + ": " + activeList.getBigDecimal(key));
         }
-        System.out.println(activeIngredients);
 
         for (String key : form.smallIngredients().keySet()) {
             double totalMass = form.smallIngredients().get(key) * quantity;
             totalMass /= 1000000.0;
 
             smallIngredients.add(new SmallIngredient(key, totalMass, smallList.getBigDecimal(key).multiply(new BigDecimal(totalMass))));
-
-            System.out.println(key + ": " + smallList.getBigDecimal(key));
         }
-        System.out.println(smallIngredients);
 
         BigDecimal totalCost = new BigDecimal(0);
         for (ActiveIngredient activeIngredient : activeIngredients) {
@@ -220,8 +222,70 @@ public class UnitsService {
         result.put("total", totalCost.setScale(2, java.math.RoundingMode.UP).doubleValue());
         result.put("bottleQuantity", bottleQuantity);
         result.put("eachBottleCost", totalCost.doubleValue() / bottleQuantity);
-        System.out.println(result);
+        logger.trace(form.toString());
+        logger.trace(result.toString());
 
         return result;
+    }
+
+    public String sendQuote(String recipient, Form form) {
+        Map<String, Double> result = submitForm(form);
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+
+        try (Workbook workbook = new XSSFWorkbook()) {
+            Sheet sheet = workbook.createSheet("Quote");
+
+            Row headerRow = sheet.createRow(0);
+            headerRow.createCell(0).setCellValue("Field");
+            headerRow.createCell(1).setCellValue("Value");
+
+            int rowNum = 1;
+            Row row = sheet.createRow(rowNum++);
+            row.createCell(0).setCellValue("Quantity");
+            row.createCell(1).setCellValue(form.quantity());
+
+            row = sheet.createRow(rowNum++);
+            row.createCell(0).setCellValue("Pills Per Bottle");
+            row.createCell(1).setCellValue(form.pillsPerBottle());
+
+            row = sheet.createRow(rowNum++);
+            row.createCell(0).setCellValue("Mass");
+            row.createCell(1).setCellValue(form.mass());
+
+            row = sheet.createRow(rowNum++);
+            row.createCell(0).setCellValue("Capsule Type");
+            row.createCell(1).setCellValue(form.capsuleType());
+
+            row = sheet.createRow(rowNum++);
+            row.createCell(0).setCellValue("Bottle Size");
+            row.createCell(1).setCellValue(form.bottleSize());
+
+            row = sheet.createRow(rowNum++);
+            row.createCell(0).setCellValue("Bottle Cap Type");
+            row.createCell(1).setCellValue(form.bottleCapType());
+
+            row = sheet.createRow(rowNum++);
+            row.createCell(0).setCellValue("Active Ingredients");
+            row.createCell(1).setCellValue(form.activeIngredients().toString());
+
+            row = sheet.createRow(rowNum++);
+            row.createCell(0).setCellValue("Small Ingredients");
+            row.createCell(1).setCellValue(form.smallIngredients().toString());
+
+            workbook.write(outputStream);
+        } catch(Exception e) {
+            logger.error("Not sent", e);
+            return "Quote could not be sent";
+        }
+
+        String subject = "Quote details";
+        String body = "Please find attached the quote details.";
+        byte[] excelBytes = outputStream.toByteArray();
+        String fileName = "Quote.xlsx";
+
+        logger.trace(email.sendEmail("andruy@gmail.com", subject, body, excelBytes, fileName));
+        // email.sendEmail(recipient, subject, body, excelBytes, fileName);
+
+        return "Quote has been sent";
     }
 }

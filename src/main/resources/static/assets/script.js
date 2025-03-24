@@ -21,7 +21,8 @@ const endpoints = {
     bottleAndCapColors: root + "bottleAndCapColors",
     activeIngredients: root + "activeIngredients",
     smallIngredients: root + "smallIngredients",
-    submit: root + "submit"
+    submit: root + "submit",
+    sendQuote: root + "sendQuote"
 }
 
 document.onload = populateQuantity();
@@ -165,7 +166,7 @@ async function updateRemainder() {
     document.querySelectorAll('.form-group')[10].style.display = boxes.length > 0 ? "block" : "none";
 
     const finalCost = new Promise(resolve => {
-        resolve(sendQuote(smallList, activeList));
+        resolve(submitForm(smallList, activeList));
     });
     const response = await finalCost;
     totalCost.innerHTML = response.total;
@@ -373,8 +374,37 @@ sendButton.addEventListener('click', event => {
     alert("You will receive a quote via email.");
 });
 
-async function sendQuote(smallList, activeList) {
+async function submitForm(smallList, activeList) {
     const response = await fetch(endpoints.submit, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            "mass": field1.value,
+            "capsuleType": field2.value,
+            "quantity": field3.value,
+            "bottleSize": field4.value,
+            "bottleColor": field5.value,
+            "bottleCapType": field6.value,
+            "bottleCapColor": field7.value,
+            "pillsPerBottle": field8.value,
+            "smallIngredients": smallList,
+            "activeIngredients": activeList
+        })
+    });
+
+    const data = await response.json();
+    console.log(data);
+    return data;
+}
+
+async function sendQuote(smallList, activeList) {
+    const formData = new FormData()
+    formData.append('recipient', 'andruy@gmail.com')
+    const queryString = new URLSearchParams(formData).toString()
+
+    const response = await fetch(endpoints.sendQuote + `?${queryString}`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
